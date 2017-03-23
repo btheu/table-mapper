@@ -8,9 +8,9 @@ JAVA Table Mapper Annotation Driven with primitives type handling
 ### Download
 ```xml
 <dependency>
-	<groupId>com.github.btheu.table-mapper</groupId>
-	<artifactId>table-mapper</artifactId>
-	<version>0.1.0</version>
+   <groupId>com.github.btheu.table-mapper</groupId>
+   <artifactId>table-mapper</artifactId>
+   <version>0.1.0</version>
 </dependency>
 ```
 
@@ -25,7 +25,7 @@ JAVA Table Mapper Annotation Driven with primitives type handling
 
 ### Sample
 ```java
-	InputStream document = ...
+    InputStream document = ...
 
     List<PojoTable> parseExcel = TableMapper.parseExcel(document, PojoTable.class);
 ```
