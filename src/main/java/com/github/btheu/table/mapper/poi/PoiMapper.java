@@ -57,7 +57,7 @@ public class PoiMapper {
         try {
             switch (type) {
             case DATE:
-                ReflectionUtils.setValue(target, field, valueCell.getDateCellValue());
+                ReflectionUtils.setValue(target, field, PoiUtils.getDateValue(valueCell, annotation.format()));
                 break;
             case INT:
                 ReflectionUtils.setValue(target, field, PoiUtils.getIntValue(valueCell));

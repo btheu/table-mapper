@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Locale;
 
 import org.apache.poi.ss.usermodel.Cell;
+
+import com.github.btheu.table.mapper.utils.DateUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PoiUtils {
 
     private static final DecimalFormat DF = new DecimalFormat("#");
-    private static final NumberFormat NF = NumberFormat.getInstance(Locale.FRENCH);
+    private static final NumberFormat  NF = NumberFormat.getInstance(Locale.FRENCH);
 
     public static String getValueString(Cell cell) {
         if (cell == null) {
@@ -132,5 +135,16 @@ public class PoiUtils {
                     .evaluate(currentCell).getNumberValue());
         }
         return null;
+    }
+
+    public static Date getDateValue(Cell valueCell, String format) {
+        if (valueCell.getCellType() == Cell.CELL_TYPE_STRING) {
+
+            return DateUtils.parse(getValueString(valueCell), format);
+        } else {
+
+            return valueCell.getDateCellValue();
+        }
+
     }
 }

@@ -22,7 +22,7 @@ public class MonTableauSheetAll {
     @Column("La ville")
     private String ville;
 
-    @Column(value = "Date création", type = CellType.DATE)
+    @Column(value = "Date création", type = CellType.DATE, format = "yyyy/MM/dd")
     private Date création;
 
     @Column(value = "Coût", type = CellType.BIG_DECIMAL)

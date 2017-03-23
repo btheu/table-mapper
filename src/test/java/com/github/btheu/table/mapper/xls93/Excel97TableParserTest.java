@@ -50,7 +50,7 @@ public class Excel97TableParserTest {
 
         TestCase.assertNotNull(parseExcel);
         TestCase.assertEquals(false, parseExcel.isEmpty());
-        TestCase.assertEquals(18, parseExcel.size());
+        TestCase.assertEquals(24, parseExcel.size());
 
     }
 
@@ -78,8 +78,7 @@ public class Excel97TableParserTest {
 
         InputStream inputStream = Excel97TableParserTest.class.getResourceAsStream(classeur);
 
-        List<MonTableauSheetFeuil2et3> parseExcel = TableMapper.parseExcel(inputStream,
-                MonTableauSheetFeuil2et3.class);
+        List<MonTableauSheetFeuil2et3> parseExcel = TableMapper.parseExcel(inputStream, MonTableauSheetFeuil2et3.class);
 
         TestCase.assertNotNull(parseExcel);
         TestCase.assertEquals(false, parseExcel.isEmpty());
