@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.github.btheu.table.mapper.Tableur2Pojo;
+import com.github.btheu.table.mapper.TableMapper;
 import com.github.btheu.table.mapper.xls93.data.MonTableauSheet1;
 import com.github.btheu.table.mapper.xls93.data.MonTableauSheetAll;
 import com.github.btheu.table.mapper.xls93.data.MonTableauSheetFeuil2et3;
@@ -30,7 +30,7 @@ public class Excel97TableParserTest {
 
         InputStream inputStream = Excel97TableParserTest.class.getResourceAsStream(classeur);
 
-        List<MonTableauSheet1> parseExcel = Tableur2Pojo.parseExcel(inputStream, MonTableauSheet1.class);
+        List<MonTableauSheet1> parseExcel = TableMapper.parseExcel(inputStream, MonTableauSheet1.class);
 
         TestCase.assertNotNull(parseExcel);
         TestCase.assertEquals(false, parseExcel.isEmpty());
@@ -46,7 +46,7 @@ public class Excel97TableParserTest {
 
         InputStream inputStream = Excel97TableParserTest.class.getResourceAsStream(classeur);
 
-        List<MonTableauSheetAll> parseExcel = Tableur2Pojo.parseExcel(inputStream, MonTableauSheetAll.class);
+        List<MonTableauSheetAll> parseExcel = TableMapper.parseExcel(inputStream, MonTableauSheetAll.class);
 
         TestCase.assertNotNull(parseExcel);
         TestCase.assertEquals(false, parseExcel.isEmpty());
@@ -62,7 +62,7 @@ public class Excel97TableParserTest {
 
         InputStream inputStream = Excel97TableParserTest.class.getResourceAsStream(classeur);
 
-        List<MonTableauSheetFeuil3> parseExcel = Tableur2Pojo.parseExcel(inputStream, MonTableauSheetFeuil3.class);
+        List<MonTableauSheetFeuil3> parseExcel = TableMapper.parseExcel(inputStream, MonTableauSheetFeuil3.class);
 
         TestCase.assertNotNull(parseExcel);
         TestCase.assertEquals(false, parseExcel.isEmpty());
@@ -78,7 +78,7 @@ public class Excel97TableParserTest {
 
         InputStream inputStream = Excel97TableParserTest.class.getResourceAsStream(classeur);
 
-        List<MonTableauSheetFeuil2et3> parseExcel = Tableur2Pojo.parseExcel(inputStream,
+        List<MonTableauSheetFeuil2et3> parseExcel = TableMapper.parseExcel(inputStream,
                 MonTableauSheetFeuil2et3.class);
 
         TestCase.assertNotNull(parseExcel);
