@@ -23,6 +23,20 @@ public @interface Column {
      */
     String value();
 
+    /**
+     * (optional)
+     * 
+     */
     CellType type() default CellType.STRING;
 
+    /**
+     * (optional) Add information for conversion. Supported types:
+     * <ul>
+     * <li><strong>date:</strong> Date pattern compliant with
+     * java.text.SimpleDateFormat
+     * </ul>
+     * 
+     * @return the format
+     */
+    String format() default "";
 }
