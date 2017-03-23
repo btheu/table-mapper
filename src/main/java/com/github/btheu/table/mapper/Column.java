@@ -24,8 +24,20 @@ public @interface Column {
     String value();
 
     /**
-     * (optional)
+     * <p>
+     * (optional) If missing or converts fails, this value will be used
+     * <p>
+     * this column is so mark as optional
      * 
+     * @return the default value in case of missing or convert fail
+     */
+    String defaultValue() default "__NOT_OPTIONAL__";
+
+    /**
+     * <p>
+     * (optional) Define the data type for conversion 
+     * 
+     * @return the value type expected
      */
     CellType type() default CellType.STRING;
 
@@ -42,7 +54,7 @@ public @interface Column {
 
     /**
      * <p>
-     * Indicate that the value is a regex
+     * (optional) Indicate that the value is a regex
      * 
      * @return true if value() must be read as a regex
      */
