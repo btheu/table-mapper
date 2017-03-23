@@ -1,44 +1,59 @@
 # table-mapper
-JAVA Table Mapper Annotation Driven
+JAVA Table Mapper Annotation Driven with primitives type handling
 
-### Gére les fichiers:
+### File types handled
 - Excel xlsx
 - Excel 1997-2003
 
+### Download
+```xml
+<dependency>
+	<groupId>com.github.btheu.table-mapper</groupId>
+	<artifactId>table-mapper</artifactId>
+	<version>0.1.0</version>
+</dependency>
+```
 
-@SheetAll
+### Main annotations
+	@SheetAll
+	
+	@Sheet("Feuil1")
+	
+	@Sheet({"Feuil1","Feuil2"})
 
-@Sheet("Feuil1")
+	@Column("Table Column Name")
 
-@Sheet({"Feuil1","Feuil2"})
+### Sample
+```java
+	InputStream document = ...
 
+    List<PojoTable> parseExcel = TableMapper.parseExcel(document, PojoTable.class);
+```
 
-# Exemple:
-
-    List<MonTableauSheetAll> parseExcel = Tableur2Pojo.parseExcel(inputStream, MonTableauSheetAll.class);
-
-
+```java
     @Data
-    // Pas de @Sheet => Chargement uniquement sur la premiere feuille
-    public class MonTableauSheet1 {
-    
-    @Column(value = "Numéro de rue", type = CellType.INT)
-    private int numero;
-    
-    @Column("La rue")
-    private String rue;
-    
-    @Column("La ville")
-    private String ville;
-    
-    @Column(value = "Date création", type = CellType.DATE)
-    private Date création;
-    
-    @Column(value = "Cout", type = CellType.BIG_DECIMAL)
-    private BigDecimal cout;
+    // No @Sheet => Handle the first sheet only by default
+    public class PojoTable {
+
+	    @Column(value = "Numéro de rue", type = CellType.INT)
+	    private int numero;
+	    
+	    @Column("La rue")
+	    private String rue;
+	    
+	    @Column("La ville")
+	    private String ville;
+	    
+	    @Column(value = "Date création", type = CellType.DATE)
+	    private Date création;
+	    
+	    @Column(value = "Cout", type = CellType.BIG_DECIMAL)
+	    private BigDecimal cout;
     
     }
+```
 
-
-# A faire:
-- *.csv
+### Roadmap:
+- Handle csv file as input
+- Handle Excel file as simple output
+- Handle csv file as output

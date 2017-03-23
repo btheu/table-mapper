@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class Tableur2Pojo {
+public class TableMapper {
 
     /**
      * Parse un tableau Excel
