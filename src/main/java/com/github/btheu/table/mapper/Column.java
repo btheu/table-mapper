@@ -39,4 +39,12 @@ public @interface Column {
      * @return the format
      */
     String format() default "";
+
+    /**
+     * <p>
+     * Indicate that the value is a regex
+     * 
+     * @return true if value() must be read as a regex
+     */
+    boolean regex() default false;
 }
