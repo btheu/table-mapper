@@ -26,7 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiTableParser {
 
-    public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
+	/**
+	 * The number of empty line telling that the table is ended.
+	 */
+    private static final int EMPTY_LINES_FOR_END = 10;
+
+	public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
         List<String> colonneNames = extractColumns(class1);
 
@@ -66,23 +71,21 @@ public class PoiTableParser {
             return results;
         }
 
-        Row currentRow = sheet.getRow(headerRow.getRow().getRowNum() + 1);
+        int lineNumber = headerRow.getRow().getRowNum();
 
         int nbEmptyRow = 0;
-        while (nbEmptyRow < 5) {
+        while (nbEmptyRow < EMPTY_LINES_FOR_END) {
+        	Row currentRow = sheet.getRow(++lineNumber);
 
             if (isEmptyRow(headerRow, currentRow)) {
                 nbEmptyRow++;
-                continue;
             } else {
                 nbEmptyRow = 0;
+                
+                T parse = parse(headerRow, currentRow, class1, colonneNames);
+                
+                results.add(parse);
             }
-
-            T parse = parse(headerRow, currentRow, class1, colonneNames);
-
-            results.add(parse);
-
-            currentRow = sheet.getRow(currentRow.getRowNum() + 1);
         }
 
         return results;
