@@ -1,5 +1,6 @@
 package com.github.btheu.table.mapper.internal;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -18,22 +19,43 @@ public class Columns {
 
 	protected List<Entry> columns = new ArrayList<Entry>();
 
-	public void add(Column column) {
-		columns.add(new Entry(column));
+	public void add(Field field) {
+		Column column = field.getAnnotation(Column.class);
+        if (column != null) {
+        	columns.add(new Entry(field, column));
+        }
 	}
-
+	
+	/**
+	 * A column mapping definition
+	 * 
+	 * @author btheu
+	 *
+	 */
+	@Data
 	public static class Entry {
 
 		protected String name;
 
+		protected String defaultValue;
+		
 		protected Pattern namePattern;
 
+		/**
+		 * The field, the column is mapped to
+		 */
+		protected Field field;
+		
 		protected boolean regex;
 
-		public Entry(Column column) {
+
+		public Entry(Field field, Column column) {
+			this.field = field;
 			name = column.value();
 			regex = column.regex();
 
+			defaultValue = column.defaultValue();
+			
 			if (regex) {
 				namePattern = Pattern.compile(name);
 			}
@@ -67,5 +89,7 @@ public class Columns {
 		}
 		return false;
 	}
+
+
 
 }

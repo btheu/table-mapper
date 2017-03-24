@@ -1,12 +1,13 @@
 package com.github.btheu.table.mapper.poi;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 
 import com.github.btheu.table.mapper.CellType;
 import com.github.btheu.table.mapper.Column;
+import com.github.btheu.table.mapper.internal.Columns;
+import com.github.btheu.table.mapper.internal.Columns.Entry;
 import com.github.btheu.table.mapper.utils.ReflectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,23 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiMapper {
 
-    public static <T> void map(final T target, final Cell headerCell, final Cell valueCell) {
+    public static <T> void map(final Columns columns, final T target, final Cell headerCell, final Cell valueCell) {
 
         try {
-            List<Field> fields = ReflectionUtils.getAllFields(target.getClass());
-            for (Field field : fields) {
-
-                Column annotation = field.getAnnotation(Column.class);
-
-                if (annotation != null && annotation.value().equalsIgnoreCase(headerCell.getStringCellValue())) {
-
-                    setValue(field, target, valueCell);
-
-                    break;
-
-                }
-
-            }
+        	for (Entry entry : columns.getColumns()) {
+				if(entry.match(headerCell.getStringCellValue())){
+					setValue(entry.getField(), target, valueCell);
+					break;
+				}
+			}
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage(), e);
         } catch (IllegalAccessException e) {

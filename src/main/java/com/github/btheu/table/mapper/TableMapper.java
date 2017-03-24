@@ -14,7 +14,7 @@ import com.github.btheu.table.mapper.poi.PoiTableParser;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Classe Publique de Tableur 2 POJO
+ * Public class TableMapper
  * 
  * @author btheu
  *
