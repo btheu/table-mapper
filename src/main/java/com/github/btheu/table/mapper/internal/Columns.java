@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.github.btheu.table.mapper.CellType;
 import com.github.btheu.table.mapper.Column;
 
 import lombok.Data;
@@ -39,22 +40,27 @@ public class Columns {
 
 		protected String defaultValue;
 		
+		protected String format;
+		
 		protected Pattern namePattern;
 
+		protected boolean regex;
+		
 		/**
 		 * The field, the column is mapped to
 		 */
 		protected Field field;
-		
-		protected boolean regex;
+
+		protected CellType type;
 
 
 		public Entry(Field field, Column column) {
 			this.field = field;
 			name = column.value();
 			regex = column.regex();
-
+			type = column.type();
 			defaultValue = column.defaultValue();
+			format = column.format();
 			
 			if (regex) {
 				namePattern = Pattern.compile(name);
