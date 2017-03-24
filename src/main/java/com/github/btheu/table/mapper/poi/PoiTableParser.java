@@ -144,9 +144,9 @@ public class PoiTableParser {
      *         été trouvé
      */
     private static HeaderRow findHeaderRow(Sheet sheet, List<String> colonneNames) {
-        for (int rowIndex = 0; rowIndex < 50; rowIndex++) {
+        for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
-            for (int cellIndex = 0; cellIndex < 50; cellIndex++) {
+            for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
                 if (row != null) {
                     Cell cell = row.getCell(cellIndex);
                     if (isCellFromHeader(cell, colonneNames)) {
