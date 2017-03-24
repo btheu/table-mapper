@@ -31,7 +31,6 @@ JAVA Table Mapper Annotation Driven with primitives type handling
 ```
 
 ```java
-    @Data
     // No @Sheet => Handle the first sheet only by default
     public class PojoTable {
 
