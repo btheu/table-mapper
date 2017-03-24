@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Classe Privée pour parser un fichier Excel
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 @Slf4j

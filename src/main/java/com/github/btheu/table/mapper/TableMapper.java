@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Classe Publique de Tableur 2 POJO
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 @Slf4j
