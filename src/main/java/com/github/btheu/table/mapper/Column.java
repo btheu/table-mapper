@@ -16,7 +16,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Column {
 
-    /**
+    public static final String NOT_OPTIONAL = "__NOT_OPTIONAL__";
+
+	/**
      * Le nom de la colonne dans le tableau fourni en entrée
      * 
      * @return Le Nom de la colonne correspondante.
@@ -31,7 +33,7 @@ public @interface Column {
      * 
      * @return the default value in case of missing or convert fail
      */
-    String defaultValue() default "__NOT_OPTIONAL__";
+    String defaultValue() default NOT_OPTIONAL;
 
     /**
      * <p>

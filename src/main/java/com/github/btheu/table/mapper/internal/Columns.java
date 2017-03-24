@@ -53,17 +53,20 @@ public class Columns {
 
 		protected CellType type;
 
-
 		public Entry(Field field, Column column) {
 			this.field = field;
 			name = column.value();
-			regex = column.regex();
 			type = column.type();
-			defaultValue = column.defaultValue();
 			format = column.format();
 			
+			regex = column.regex();
 			if (regex) {
 				namePattern = Pattern.compile(name);
+			}
+			
+			defaultValue = column.defaultValue();
+			if(defaultValue.equals(Column.NOT_OPTIONAL)){
+				defaultValue = null;
 			}
 		}
 
@@ -74,7 +77,9 @@ public class Columns {
 		 */
 		public boolean match(String columnName) {
 			if(regex){
-				return namePattern.matcher(columnName).matches();
+				boolean matches = namePattern.matcher(columnName).matches();
+				
+				return matches;
 			}else{
 				return name.equalsIgnoreCase(columnName);
 			}

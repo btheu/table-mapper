@@ -46,7 +46,7 @@ public class PoiMapper {
 	}
 
 	/**
-	 * Handle type conversion and default value .
+	 * Handle type conversion and default value.
 	 * 
 	 * @param entry
 	 * @param valueCell
@@ -54,21 +54,37 @@ public class PoiMapper {
 	 */
 	private static Object safeEvaluate(Entry entry, Cell valueCell) {
 
-		if (valueCell == null) {
-			return null;
-		}
-
 		Object value;
 
-		CellType type = entry.getType();
+		String defaultValue = entry.getDefaultValue();
+
+		CellType targetType = entry.getType();
+		switch (targetType) {
+		case DATE:
+			value = PoiUtils2.getDateValue(valueCell, defaultValue, entry.getFormat());
+			break;
+		case INT:
+			value = PoiUtils2.getIntValue(valueCell, defaultValue);
+			break;
+		case LONG:
+			// FIXME btheu continue
+			break;
+		case DOUBLE:
+			// FIXME btheu continue
+			break;
+		case BIG_DECIMAL:
+			// FIXME btheu continue
+			break;
+		case STRING:
+			// FIXME btheu continue
+			break;
+		default:
+			throw new RuntimeException("Not handled: " + targetType.name());
+		}
+
+
 		try {
-			switch (type) {
-			case DATE:
-				value = PoiUtils.getDateValue(valueCell, entry.getFormat());
-				break;
-			case INT:
-				value = PoiUtils.getIntValue(valueCell);
-				break;
+			switch (targetType) {
 			case LONG:
 				value = PoiUtils.getLongValue(valueCell);
 				break;
@@ -82,7 +98,7 @@ public class PoiMapper {
 				value = PoiUtils.getValueString(valueCell);
 				break;
 			default:
-				throw new RuntimeException("Not handled: " + type.name());
+				throw new RuntimeException("Not handled: " + targetType.name());
 
 			}
 		} catch (NumberFormatException e) {
