@@ -27,9 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 public class PoiTableParser {
 
 	/**
+	 *  Size max of table header. Aka, column number max.
+	 */
+	public static int HEADER_SIZE_MAX = 100;
+	
+	/**
 	 * The number of empty line telling that the table is ended.
 	 */
-    private static final int EMPTY_LINES_FOR_END = 10;
+	public static int EMPTY_LINES_FOR_END = 10;
 
 	public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
@@ -176,7 +181,7 @@ public class PoiTableParser {
 
         for (String colonneName : colonneNames) {
             boolean found = false;
-            for (int cellIndex = indexFirstCell; cellIndex < indexFirstCell + 50; cellIndex++) {
+            for (int cellIndex = indexFirstCell; cellIndex < indexFirstCell + HEADER_SIZE_MAX; cellIndex++) {
 
                 Cell current = firstCell.getRow().getCell(cellIndex);
 
