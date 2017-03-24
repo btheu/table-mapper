@@ -1,9 +1,15 @@
 # table-mapper
-JAVA Table Mapper Annotation Driven with primitives type handling
+JAVA Table Mapper Annotation Driven
 
 ### File types handled
 - Excel xlsx
 - Excel 1997-2003
+
+### Features
+- Primitives types conversions
+- Default column value
+- Regular expression as column name
+- Date formatter for parsing string value
 
 ### Download
 ```xml
