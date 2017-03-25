@@ -22,7 +22,7 @@ public class MonTableauSheetFeuil3 {
     @Column("La ville")
     private String ville;
 
-    @Column(value = "Date création", type = CellType.DATE)
+    @Column(value = "Date cr.ation", type = CellType.DATE, regex=true)
     private Date création;
 
     @Column(value = "Coût", type = CellType.BIG_DECIMAL)

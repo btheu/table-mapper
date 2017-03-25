@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Precise au parser d'agreger les tableaux de toutes les feuilles excel tant que le format des colonnes est correcte
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 @Inherited

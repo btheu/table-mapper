@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 public class ReflectionUtils {

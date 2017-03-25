@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 @Inherited

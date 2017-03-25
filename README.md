@@ -1,16 +1,22 @@
 # table-mapper
-JAVA Table Mapper Annotation Driven with primitives type handling
+JAVA Table Mapper Annotation Driven
 
 ### File types handled
 - Excel xlsx
 - Excel 1997-2003
+
+### Features
+- Primitives types conversions
+- Default value
+- Column name with regular expression
+- Date formatter for parsing date string value
 
 ### Download
 ```xml
 <dependency>
    <groupId>com.github.btheu.table-mapper</groupId>
    <artifactId>table-mapper</artifactId>
-   <version>0.1.0</version>
+   <version>0.2.0</version>
 </dependency>
 ```
 

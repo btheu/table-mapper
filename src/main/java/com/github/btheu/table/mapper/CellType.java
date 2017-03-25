@@ -3,7 +3,7 @@ package com.github.btheu.table.mapper;
 /**
  * Définition des types de données
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 public enum CellType {

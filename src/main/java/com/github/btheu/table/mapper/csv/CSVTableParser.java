@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Classe Privée pour parser un fichier CSV
  * 
- * @author theunissenb
+ * @author btheu
  *
  */
 public class CSVTableParser {
