@@ -25,18 +25,12 @@ public class PoiUtils2 {
     public static final NumberFormat  NF = NumberFormat.getInstance(Locale.FRENCH);
 
     public static Date getDateValue(Cell cell, String defaultValue, String format) {
-        if (cell == null) {
+        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
             return DateUtils.parse(defaultValue, format);
         }
-
-        log.debug("{} {}", toString(cell), cell.getCellType(), Cell.CELL_TYPE_NUMERIC);
-
         if (isAnyType(cell, Cell.CELL_TYPE_STRING, Cell.CELL_TYPE_FORMULA)) {
-            log.debug("parse date");
             return DateUtils.parse(getValueString(cell).trim(), format, defaultValue);
         } else {
-
-            log.debug("get date");
             return cell.getDateCellValue();
         }
 
@@ -61,7 +55,7 @@ public class PoiUtils2 {
     }
 
     public static Integer getIntValue(Cell cell, String defaultValue) {
-        if (cell == null) {
+        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
             return Integer.parseInt(defaultValue);
         }
 
@@ -83,7 +77,7 @@ public class PoiUtils2 {
     }
 
     public static Long getLongValue(Cell cell, String defaultValue) {
-        if (cell == null) {
+        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
             return Long.parseLong(defaultValue);
         }
 
@@ -105,7 +99,7 @@ public class PoiUtils2 {
     }
 
     public static Double getDoubleValue(Cell cell, String defaultValue) {
-        if (cell == null) {
+        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
             return Double.parseDouble(defaultValue);
         }
 
@@ -127,7 +121,7 @@ public class PoiUtils2 {
     }
 
     public static BigDecimal getBigDecimalValue(Cell cell, String defaultValue) {
-        if (cell == null) {
+        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
             return new BigDecimal(defaultValue);
         }
 
