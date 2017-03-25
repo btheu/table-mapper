@@ -52,6 +52,10 @@ public class Excel97TableParserTest {
         TestCase.assertEquals(false, parseExcel.isEmpty());
         TestCase.assertEquals(24, parseExcel.size());
 
+        for (MonTableauSheetAll monTableauSheetAll : parseExcel) {
+            log.info("{}", monTableauSheetAll);
+        }
+
     }
 
     @Test

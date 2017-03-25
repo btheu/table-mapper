@@ -19,102 +19,72 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiMapper {
 
-	public static <T> void map(final Columns columns, final T target, final Cell headerCell, final Cell valueCell) {
+    public static <T> void map(final Columns columns, final T target, final Cell headerCell, final Cell valueCell) {
 
-		try {
-			for (Entry entry : columns.getColumns()) {
-				if (entry.match(headerCell.getStringCellValue())) {
-					setValue(entry, target, valueCell);
-					break;
-				}
-			}
-		} catch (IllegalArgumentException e) {
-			log.error(e.getMessage(), e);
-		} catch (IllegalAccessException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+        try {
+            for (Entry entry : columns.getColumns()) {
+                if (entry.match(headerCell.getStringCellValue())) {
+                    setValue(entry, target, valueCell);
+                    break;
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	public static <T> void setValue(Entry entry, final T target, final Cell valueCell)
-			throws IllegalArgumentException, IllegalAccessException {
+    public static <T> void setValue(Entry entry, final T target, final Cell valueCell)
+            throws IllegalArgumentException, IllegalAccessException {
 
-		Object value = safeEvaluate(entry, valueCell);
+        Object value = safeEvaluate(entry, valueCell);
 
-		Field field = entry.getField();
+        Field field = entry.getField();
 
-		ReflectionUtils.setValue(target, field, value);
-	}
+        ReflectionUtils.setValue(target, field, value);
+    }
 
-	/**
-	 * Handle type conversion and default value.
-	 * 
-	 * @param entry
-	 * @param valueCell
-	 * @return
-	 */
-	private static Object safeEvaluate(Entry entry, Cell valueCell) {
+    /**
+     * Handle type conversion and default value.
+     * 
+     * @param entry
+     * @param valueCell
+     * @return
+     */
+    private static Object safeEvaluate(Entry entry, Cell valueCell) {
 
-		Object value;
+        Object value;
 
-		String defaultValue = entry.getDefaultValue();
+        String defaultValue = entry.getDefaultValue();
 
-		CellType targetType = entry.getType();
-		switch (targetType) {
-		case DATE:
-			value = PoiUtils2.getDateValue(valueCell, defaultValue, entry.getFormat());
-			break;
-		case INT:
-			value = PoiUtils2.getIntValue(valueCell, defaultValue);
-			break;
-		case LONG:
-			// FIXME btheu continue
-			break;
-		case DOUBLE:
-			// FIXME btheu continue
-			break;
-		case BIG_DECIMAL:
-			// FIXME btheu continue
-			break;
-		case STRING:
-			// FIXME btheu continue
-			break;
-		default:
-			throw new RuntimeException("Not handled: " + targetType.name());
-		}
+        log.debug("{} {}", entry.getName(), entry.getType().name());
 
+        CellType targetType = entry.getType();
+        switch (targetType) {
+        case DATE:
+            value = PoiUtils2.getDateValue(valueCell, defaultValue, entry.getFormat());
+            break;
+        case INT:
+            value = PoiUtils2.getIntValue(valueCell, defaultValue);
+            break;
+        case LONG:
+            value = PoiUtils2.getLongValue(valueCell, defaultValue);
+            break;
+        case DOUBLE:
+            value = PoiUtils2.getDoubleValue(valueCell, defaultValue);
+            break;
+        case BIG_DECIMAL:
+            value = PoiUtils2.getBigDecimalValue(valueCell, defaultValue);
+            break;
+        case STRING:
+            value = PoiUtils2.getValueString(valueCell);
+            break;
+        default:
+            throw new RuntimeException("Not handled: " + targetType.name());
+        }
 
-		try {
-			switch (targetType) {
-			case LONG:
-				value = PoiUtils.getLongValue(valueCell);
-				break;
-			case DOUBLE:
-				value = PoiUtils.getDoubleValue(valueCell);
-				break;
-			case BIG_DECIMAL:
-				value = PoiUtils.getBigDecimalValue(valueCell);
-				break;
-			case STRING:
-				value = PoiUtils.getValueString(valueCell);
-				break;
-			default:
-				throw new RuntimeException("Not handled: " + targetType.name());
-
-			}
-		} catch (NumberFormatException e) {
-			log.error(valueCell.getSheet().getSheetName() + " " + valueCell.getColumnIndex() + ":"
-					+ valueCell.getRowIndex() + " => '" + PoiUtils.getValueString(valueCell) + "', type: "
-					+ valueCell.getCellType());
-			throw new RuntimeException(e.getMessage(), e);
-
-		} catch (IllegalStateException e) {
-			log.error(valueCell.getSheet().getSheetName() + " " + valueCell.getColumnIndex() + ":"
-					+ valueCell.getRowIndex() + " => '" + PoiUtils.getValueString(valueCell) + "', type: "
-					+ valueCell.getCellType());
-			throw new IllegalStateException(e);
-		}
-
-		return value;
-	}
+        return value;
+    }
 
 }

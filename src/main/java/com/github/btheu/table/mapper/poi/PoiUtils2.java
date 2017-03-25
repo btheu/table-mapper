@@ -1,8 +1,8 @@
 package com.github.btheu.table.mapper.poi;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -21,73 +21,166 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiUtils2 {
 
-	public static final DecimalFormat DF = new DecimalFormat("#");
-	public static final NumberFormat NF = NumberFormat.getInstance(Locale.FRENCH);
+    public static final DecimalFormat DF = new DecimalFormat("#");
+    public static final NumberFormat  NF = NumberFormat.getInstance(Locale.FRENCH);
 
-	public static Date getDateValue(Cell cell, String defaultValue, String format) {
-		if (cell == null) {
-			return DateUtils.parse(defaultValue, format);
-		}
+    public static Date getDateValue(Cell cell, String defaultValue, String format) {
+        if (cell == null) {
+            return DateUtils.parse(defaultValue, format);
+        }
 
-		if (isAnyType(cell, Cell.CELL_TYPE_STRING, Cell.CELL_TYPE_FORMULA)) {
-			return DateUtils.parse(getValueString(cell).trim(), format, defaultValue);
-		} else {
-			return cell.getDateCellValue();
-		}
+        log.debug("{} {}", toString(cell), cell.getCellType(), Cell.CELL_TYPE_NUMERIC);
 
-	}
+        if (isAnyType(cell, Cell.CELL_TYPE_STRING, Cell.CELL_TYPE_FORMULA)) {
+            log.debug("parse date");
+            return DateUtils.parse(getValueString(cell).trim(), format, defaultValue);
+        } else {
 
-	public static int getIntValue(Cell cell, String defaultValue) {
-		if (cell == null) {
-			Integer.parseInt(defaultValue);
-		}
+            log.debug("get date");
+            return cell.getDateCellValue();
+        }
 
-		if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			return (int) cell.getNumericCellValue();
-		}
+    }
 
-		if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-			String stringCellValue = cell.getStringCellValue().trim();
+    public static String toString(Cell cell) {
 
-			return NumberUtils.parseInt(stringCellValue, defaultValue);
-		}
+        StringBuilder sb = new StringBuilder();
 
-		if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
-			return (int) cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell)
-					.getNumberValue();
-		}
+        sb.append(cell.getSheet().getSheetName());
 
-		return 0;
-	}
+        sb.append(" [");
+        sb.append(cell.getRowIndex() + 1);
+        sb.append(",");
+        sb.append(cell.getColumnIndex() + 1);
+        sb.append("]");
+        sb.append("(");
+        sb.append(getValueString(cell));
+        sb.append(")");
 
-	public static boolean isAnyType(Cell cell, int... types) {
-		return Arrays.asList(types).contains(cell.getCellType());
-	}
+        return sb.toString();
+    }
 
-	public static String getValueString(Cell cell) {
-		if (cell == null) {
-			return "";
-		}
-		int cellType = cell.getCellType();
-		switch (cellType) {
-		case Cell.CELL_TYPE_BLANK:
-			return "";
-		case Cell.CELL_TYPE_BOOLEAN:
-			return Boolean.toString(cell.getBooleanCellValue());
-		case Cell.CELL_TYPE_ERROR:
-			return "error";
-		case Cell.CELL_TYPE_FORMULA:
-			return cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell)
-					.getStringValue();
-		case Cell.CELL_TYPE_NUMERIC:
-			return DF.format(cell.getNumericCellValue());
-		case Cell.CELL_TYPE_STRING:
-			return cell.getStringCellValue();
-		default:
-			log.error("Type unknown : '{}'", cellType);
-		}
+    public static Integer getIntValue(Cell cell, String defaultValue) {
+        if (cell == null) {
+            return Integer.parseInt(defaultValue);
+        }
 
-		return null;
-	}
+        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            return (int) cell.getNumericCellValue();
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            String stringCellValue = cell.getStringCellValue().trim();
+
+            return NumberUtils.parseInt(stringCellValue, defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+            return (int) cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell)
+                    .getNumberValue();
+        }
+        return null;
+    }
+
+    public static Long getLongValue(Cell cell, String defaultValue) {
+        if (cell == null) {
+            return Long.parseLong(defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            return Math.round(cell.getNumericCellValue());
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            String stringCellValue = cell.getStringCellValue().trim();
+
+            return NumberUtils.parseLong(stringCellValue, defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+            return (long) cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell)
+                    .getNumberValue();
+        }
+        return null;
+    }
+
+    public static Double getDoubleValue(Cell cell, String defaultValue) {
+        if (cell == null) {
+            return Double.parseDouble(defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            return cell.getNumericCellValue();
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            String stringCellValue = cell.getStringCellValue().trim();
+
+            return NumberUtils.parseDouble(stringCellValue, defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+            return cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell)
+                    .getNumberValue();
+        }
+        return null;
+    }
+
+    public static BigDecimal getBigDecimalValue(Cell cell, String defaultValue) {
+        if (cell == null) {
+            return new BigDecimal(defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            return new BigDecimal(cell.getNumericCellValue());
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            String stringCellValue = cell.getStringCellValue().trim();
+
+            return NumberUtils.parseBigDecimal(stringCellValue, defaultValue);
+        }
+
+        if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+            return new BigDecimal(cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator()
+                    .evaluate(cell).getNumberValue());
+        }
+        return null;
+    }
+
+    public static boolean isAnyType(Cell cell, int... types) {
+        for (int i : types) {
+            if (cell.getCellType() == i) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String getValueString(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        int cellType = cell.getCellType();
+        switch (cellType) {
+        case Cell.CELL_TYPE_BLANK:
+            return "";
+        case Cell.CELL_TYPE_BOOLEAN:
+            return Boolean.toString(cell.getBooleanCellValue());
+        case Cell.CELL_TYPE_ERROR:
+            return "error";
+        case Cell.CELL_TYPE_FORMULA:
+            return cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell)
+                    .getStringValue();
+        case Cell.CELL_TYPE_NUMERIC:
+            return DF.format(cell.getNumericCellValue());
+        case Cell.CELL_TYPE_STRING:
+            return cell.getStringCellValue();
+        default:
+            log.error("Type unknown : '{}'", cellType);
+        }
+
+        return null;
+    }
 
 }
