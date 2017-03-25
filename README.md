@@ -7,16 +7,16 @@ JAVA Table Mapper Annotation Driven
 
 ### Features
 - Primitives types conversions
-- Default column value
-- Regular expression as column name
-- Date formatter for parsing string value
+- Default value
+- Column name with regular expression
+- Date formatter for parsing date string value
 
 ### Download
 ```xml
 <dependency>
    <groupId>com.github.btheu.table-mapper</groupId>
    <artifactId>table-mapper</artifactId>
-   <version>0.1.0</version>
+   <version>0.2.0</version>
 </dependency>
 ```
 
