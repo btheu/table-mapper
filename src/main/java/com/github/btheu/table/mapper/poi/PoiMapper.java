@@ -59,28 +59,28 @@ public class PoiMapper {
         String defaultValue = entry.getDefaultValue();
 
         if (log.isDebugEnabled()) {
-            log.debug("{}\t{} {}", PoiUtils2.toString(valueCell), entry.getType().name(), entry.getName());
+            log.debug("{}\t{} {}", PoiUtils.toString(valueCell), entry.getType().name(), entry.getName());
         }
 
         CellType targetType = entry.getType();
         switch (targetType) {
         case DATE:
-            value = PoiUtils2.getDateValue(valueCell, defaultValue, entry.getFormat());
+            value = PoiUtils.getDateValue(valueCell, defaultValue, entry.getFormat());
             break;
         case INT:
-            value = PoiUtils2.getIntValue(valueCell, defaultValue);
+            value = PoiUtils.getIntValue(valueCell, defaultValue);
             break;
         case LONG:
-            value = PoiUtils2.getLongValue(valueCell, defaultValue);
+            value = PoiUtils.getLongValue(valueCell, defaultValue);
             break;
         case DOUBLE:
-            value = PoiUtils2.getDoubleValue(valueCell, defaultValue);
+            value = PoiUtils.getDoubleValue(valueCell, defaultValue);
             break;
         case BIG_DECIMAL:
-            value = PoiUtils2.getBigDecimalValue(valueCell, defaultValue);
+            value = PoiUtils.getBigDecimalValue(valueCell, defaultValue);
             break;
         case STRING:
-            value = PoiUtils2.getValueString(valueCell);
+            value = PoiUtils.getValueString(valueCell);
             break;
         default:
             throw new RuntimeException("Not handled: " + targetType.name());
