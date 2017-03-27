@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PoiUtils2 {
 
     public static final DecimalFormat DF = new DecimalFormat("#");
-    public static final NumberFormat  NF = NumberFormat.getInstance(Locale.FRENCH);
+    public static final NumberFormat NF = NumberFormat.getInstance(Locale.FRENCH);
 
     public static Date getDateValue(Cell cell, String defaultValue, String format) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
@@ -40,16 +40,20 @@ public class PoiUtils2 {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(cell.getSheet().getSheetName());
+        if (cell == null) {
+            sb.append("null cell");
+        } else {
+            sb.append(cell.getSheet().getSheetName());
 
-        sb.append(" [");
-        sb.append(cell.getRowIndex() + 1);
-        sb.append(",");
-        sb.append(cell.getColumnIndex() + 1);
-        sb.append("]");
-        sb.append("(");
-        sb.append(getValueString(cell));
-        sb.append(")");
+            sb.append(" [");
+            sb.append(cell.getRowIndex() + 1);
+            sb.append(",");
+            sb.append(cell.getColumnIndex() + 1);
+            sb.append("]");
+            sb.append("(");
+            sb.append(getValueString(cell));
+            sb.append(")");
+        }
 
         return sb.toString();
     }

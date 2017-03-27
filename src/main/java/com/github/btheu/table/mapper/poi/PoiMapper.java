@@ -58,7 +58,9 @@ public class PoiMapper {
 
         String defaultValue = entry.getDefaultValue();
 
-        log.debug("{}\t{} {}", PoiUtils2.toString(valueCell), entry.getType().name(), entry.getName());
+        if (log.isDebugEnabled()) {
+            log.debug("{}\t{} {}", PoiUtils2.toString(valueCell), entry.getType().name(), entry.getName());
+        }
 
         CellType targetType = entry.getType();
         switch (targetType) {
