@@ -16,7 +16,7 @@ JAVA Table Mapper Annotation Driven
 <dependency>
    <groupId>com.github.btheu.table-mapper</groupId>
    <artifactId>table-mapper</artifactId>
-   <version>0.2.0</version>
+   <version>0.2.1</version>
 </dependency>
 ```
 
@@ -35,6 +35,8 @@ JAVA Table Mapper Annotation Driven
 
     List<PojoTable> parseExcel = TableMapper.parseExcel(document, PojoTable.class);
 ```
+
+![alt tag](https://raw.githubusercontent.com/btheu/table-mapper/master/media/sample.png)
 
 ```java
     // No @Sheet => Handle the first sheet only by default
