@@ -10,9 +10,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import com.github.btheu.table.mapper.SheetAll;
 import com.github.btheu.table.mapper.internal.Columns;
 import com.github.btheu.table.mapper.internal.Columns.Entry;
 import com.github.btheu.table.mapper.internal.TableParser;
+import com.github.btheu.table.mapper.poi.Header.HeaderCell;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,14 +41,14 @@ public class PoiTableParser {
 
         Columns columns = TableParser.parseClass(class1);
 
-        return parse(workbook, class1, columns);
+        return parse(workbook, columns);
     }
 
-    private static <T> List<T> parse(Workbook workbook, Class<T> class1, Columns columns) {
+    private static <T> List<T> parse(Workbook workbook, Columns columns) {
 
         List<T> results = new ArrayList<T>();
 
-        List<String> sheetNames = extractSheetsNames(workbook, class1);
+        List<String> sheetNames = extractSheetsNames(workbook, columns.getDataClass());
 
         for (String sheetName : sheetNames) {
             Sheet sheet = workbook.getSheet(sheetName);
@@ -54,9 +56,9 @@ public class PoiTableParser {
                 throw new RuntimeException("Sheet '" + sheetName + "' was not found in the WorkBook");
             }
 
-            log.debug("Reading: {}", sheetName);
+            log.debug("Analysing: {}", sheetName);
 
-            List<T> parse = parse(sheet, class1, columns);
+            List<T> parse = parse(sheet, columns);
 
             results.addAll(parse);
         }
@@ -65,13 +67,13 @@ public class PoiTableParser {
 
     }
 
-    private static <T> List<T> parse(Sheet sheet, Class<T> class1, Columns columns) {
+    private static <T> List<T> parse(Sheet sheet, Columns columns) {
 
         List<T> results = new ArrayList<T>();
 
         HeaderRow headerRow = findHeaderRow(sheet, columns);
         if (headerRow == null) {
-            log.debug("[{}] have no table for [{}]", sheet.getSheetName(), class1.getSimpleName());
+            log.debug("[{}] have no table for [{}]", sheet.getSheetName(), columns.getDataClass().getSimpleName());
             return results;
         }
 
@@ -86,7 +88,7 @@ public class PoiTableParser {
             } else {
                 nbEmptyRow = 0;
 
-                T parse = parse(headerRow, currentRow, class1, columns);
+                T parse = parse(headerRow, currentRow, columns);
 
                 results.add(parse);
             }
@@ -95,10 +97,34 @@ public class PoiTableParser {
         return results;
     }
 
-    private static <T> T parse(HeaderRow headerRow, Row currentRow, Class<T> class1, Columns columns) {
+    @SuppressWarnings("unchecked")
+    public static <T> T parse(Header header, Row currentRow, Columns columns) {
 
         try {
-            T result = class1.newInstance();
+            T result = (T) columns.getDataClass().newInstance();
+
+            for (HeaderCell headerCell : header) {
+
+                PoiMapper.setValue(headerCell.getEntry(), result,
+                        currentRow.getCell(headerCell.getHeaderCell().getColumnIndex()));
+
+            }
+
+            return result;
+
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public static <T> T parse(HeaderRow headerRow, Row currentRow, Columns columns) {
+
+        try {
+            T result = (T) columns.getDataClass().newInstance();
 
             for (int columnIndex = headerRow.getCellIndexBegin(); columnIndex <= headerRow
                     .getCellIndexEnd(); columnIndex++) {
@@ -116,7 +142,24 @@ public class PoiTableParser {
         }
     }
 
-    private static boolean isEmptyRow(HeaderRow headerRow, Row currentRow) {
+    public static boolean isEmptyRow2(Header headerRow, Row currentRow) {
+        if (currentRow == null) {
+            return true;
+        }
+
+        for (HeaderCell headerCell : headerRow) {
+            Cell currentCell = currentRow.getCell(headerCell.getHeaderCell().getColumnIndex());
+
+            String value = PoiUtils.getValueString(currentCell);
+            if (StringUtils.isNotBlank(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Deprecated
+    public static boolean isEmptyRow(HeaderRow headerRow, Row currentRow) {
         if (currentRow == null) {
             return true;
         }
@@ -133,6 +176,28 @@ public class PoiTableParser {
         return true;
     }
 
+    public static Header findHeaderRow2(Sheet sheet, Columns columns) {
+
+        for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
+            Row row = sheet.getRow(rowIndex);
+            if (row != null) {
+                for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
+                    Cell cell = row.getCell(cellIndex);
+                    if (isCellFromHeader(cell, columns)) {
+                        int lastIndex = isHeaderRow(cell, columns);
+                        if (lastIndex != -1) {
+                            log.debug("Header found");
+
+                            return new Header(cell, columns);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+
+    }
+
     /**
      * Recherche une ligne dans le tableur correspondant aux colonnes attendues
      * par le POJO
@@ -143,12 +208,14 @@ public class PoiTableParser {
      *            Le nom des colonnes reherchées
      * @return Un objet contenant les informations relatives à l'entete du
      *         tableau recherché, null si le tableau n'a pas été trouvé
+     * @deprecated user findHeaderRow2
      */
-    private static HeaderRow findHeaderRow(Sheet sheet, Columns columns) {
+    @Deprecated
+    public static HeaderRow findHeaderRow(Sheet sheet, Columns columns) {
         for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
-            for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
-                if (row != null) {
+            if (row != null) {
+                for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
                     Cell cell = row.getCell(cellIndex);
                     if (isCellFromHeader(cell, columns)) {
                         int lastIndex = isHeaderRow(cell, columns);
@@ -209,12 +276,11 @@ public class PoiTableParser {
         return cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && columns.match(cell.getStringCellValue());
     }
 
-    private static <T> List<String> extractSheetsNames(Workbook workbook, Class<T> class1) {
+    public static <T> List<String> extractSheetsNames(Workbook workbook, Class<T> class1) {
         List<String> names = new ArrayList<String>();
 
         // Annotation @SheetAll
-        com.github.btheu.table.mapper.SheetAll annotationSheetAll = class1
-                .getAnnotation(com.github.btheu.table.mapper.SheetAll.class);
+        SheetAll annotationSheetAll = class1.getAnnotation(SheetAll.class);
 
         if (annotationSheetAll != null) {
             // Toutes les feuilles

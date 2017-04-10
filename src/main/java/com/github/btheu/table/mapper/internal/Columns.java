@@ -40,6 +40,7 @@ public class Columns {
             Entry entry = new Entry(field, aColumn);
 
             if (aId != null) {
+                entry.setPrimaryKey(true);
                 primaries.add(entry);
             }
 
@@ -65,6 +66,8 @@ public class Columns {
         protected Pattern namePattern;
 
         protected boolean regex;
+
+        protected boolean primaryKey;
 
         /**
          * The field, the column is mapped to
