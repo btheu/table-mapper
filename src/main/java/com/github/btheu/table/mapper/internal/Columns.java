@@ -7,100 +7,118 @@ import java.util.regex.Pattern;
 
 import com.github.btheu.table.mapper.CellType;
 import com.github.btheu.table.mapper.Column;
+import com.github.btheu.table.mapper.Id;
 
 import lombok.Data;
 
 /**
  * 
  * @author btheu
- *
+ * 
  */
+// TODO BTHEU rename Columns to TableData
+// TODO BTHEU rename Entry to ColumnData
 @Data
 public class Columns {
 
-	protected List<Entry> columns = new ArrayList<Entry>();
+    protected List<Entry> primaries = new ArrayList<Entry>();
 
-	public void add(Field field) {
-		Column column = field.getAnnotation(Column.class);
-        if (column != null) {
-        	columns.add(new Entry(field, column));
+    protected List<Entry> columns = new ArrayList<Entry>();
+
+    protected Class<?> dataClass;
+
+    public Columns(Class<?> clazz) {
+        this.dataClass = clazz;
+    }
+
+    public void add(Field field) {
+
+        Id aId = field.getAnnotation(Id.class);
+
+        Column aColumn = field.getAnnotation(Column.class);
+        if (aColumn != null) {
+            Entry entry = new Entry(field, aColumn);
+
+            if (aId != null) {
+                primaries.add(entry);
+            }
+
+            columns.add(entry);
         }
-	}
-	
-	/**
-	 * A column mapping definition
-	 * 
-	 * @author btheu
-	 *
-	 */
-	@Data
-	public static class Entry {
+    }
 
-		protected String name;
+    /**
+     * A column mapping definition
+     * 
+     * @author btheu
+     *
+     */
+    @Data
+    public static class Entry {
 
-		protected String defaultValue;
-		
-		protected String format;
-		
-		protected Pattern namePattern;
+        protected String name;
 
-		protected boolean regex;
-		
-		/**
-		 * The field, the column is mapped to
-		 */
-		protected Field field;
+        protected String defaultValue;
 
-		protected CellType type;
+        protected String format;
 
-		public Entry(Field field, Column column) {
-			this.field = field;
-			name = column.value();
-			type = column.type();
-			format = column.format();
-			
-			regex = column.regex();
-			if (regex) {
-				namePattern = Pattern.compile(name);
-			}
-			
-			defaultValue = column.defaultValue();
-			if(defaultValue.equals(Column.NOT_OPTIONAL)){
-				defaultValue = null;
-			}
-		}
+        protected Pattern namePattern;
 
-		/**
-		 * 
-		 * @param columnName
-		 * @return true if columnName match the column name or pattern
-		 */
-		public boolean match(String columnName) {
-			if(regex){
-				boolean matches = namePattern.matcher(columnName).matches();
-				
-				return matches;
-			}else{
-				return name.equalsIgnoreCase(columnName);
-			}
-		}
+        protected boolean regex;
 
-	}
+        /**
+         * The field, the column is mapped to
+         */
+        protected Field field;
 
-	/**
-	 * 
-	 * @param columnName
-	 * @return true if columName match at least one column
-	 */
-	public boolean match(String columnName) {
-		for (Entry entry : columns) {
-			if(entry.match(columnName)){
-				return true;
-			}
-		}
-		return false;
-	}
+        protected CellType type;
 
+        public Entry(Field field, Column column) {
+            this.field = field;
+            name = column.value();
+            type = column.type();
+            format = column.format();
 
+            regex = column.regex();
+            if (regex) {
+                namePattern = Pattern.compile(name);
+            }
+
+            defaultValue = column.defaultValue();
+            if (defaultValue.equals(Column.NOT_OPTIONAL)) {
+                defaultValue = null;
+            }
+        }
+
+        /**
+         * 
+         * @param columnName
+         * @return true if columnName match the column name or pattern
+         */
+        public boolean match(String columnName) {
+            if (regex) {
+                boolean matches = namePattern.matcher(columnName).matches();
+
+                return matches;
+            } else {
+                return name.equalsIgnoreCase(columnName);
+            }
+        }
+
+    }
+
+    /**
+     * 
+     * @param columnName
+     * @return true if columName match at least one column
+     */
+    public boolean match(String columnName) {
+        for (Entry entry : columns) {
+            if (entry.match(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

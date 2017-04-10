@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.github.btheu.table.mapper.utils.ReflectionUtils;
 
-public class Parser {
+public class TableParser {
 
-    public static <T> Columns extractColumns(Class<T> class1) {
+    public static <T> Columns parseClass(Class<T> class1) {
         Columns columns = new Columns(class1);
 
         List<Field> allFields = ReflectionUtils.getAllFields(class1);

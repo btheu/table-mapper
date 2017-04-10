@@ -12,7 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import com.github.btheu.table.mapper.internal.Columns;
 import com.github.btheu.table.mapper.internal.Columns.Entry;
-import com.github.btheu.table.mapper.internal.Parser;
+import com.github.btheu.table.mapper.internal.TableParser;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +37,7 @@ public class PoiTableParser {
 
     public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
-        Columns columns = Parser.extractColumns(class1);
+        Columns columns = TableParser.parseClass(class1);
 
         return parse(workbook, class1, columns);
     }
