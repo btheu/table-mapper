@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.github.btheu.table.mapper.csv.CSVTableParser;
 import com.github.btheu.table.mapper.poi.PoiTableParser;
+import com.github.btheu.table.mapper.poi.PoiTableWriter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,20 @@ public class TableMapper {
         }
 
         return null;
+    }
+
+    public static <T> void writeExcel(InputStream inputStream, List<T> rows) {
+        try {
+            Workbook wb = WorkbookFactory.create(inputStream);
+
+            PoiTableWriter.write(wb, rows);
+
+            wb.close();
+        } catch (InvalidFormatException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**

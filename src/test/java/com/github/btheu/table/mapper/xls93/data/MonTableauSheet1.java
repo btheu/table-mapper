@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.github.btheu.table.mapper.CellType;
 import com.github.btheu.table.mapper.Column;
+import com.github.btheu.table.mapper.Id;
 
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import lombok.Data;
 // Pas de @Sheet => Chargement uniquement sur la premiere feuille
 public class MonTableauSheet1 {
 
+    @Id
     @Column(value = "Numéro de rue", type = CellType.INT)
     private int numero;
 
