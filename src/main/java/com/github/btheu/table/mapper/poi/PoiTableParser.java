@@ -1,6 +1,5 @@
 package com.github.btheu.table.mapper.poi;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import com.github.btheu.table.mapper.internal.Columns;
 import com.github.btheu.table.mapper.internal.Columns.Entry;
-import com.github.btheu.table.mapper.utils.ReflectionUtils;
+import com.github.btheu.table.mapper.internal.Parser;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +37,7 @@ public class PoiTableParser {
 
     public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
-        Columns columns = extractColumns(class1);
+        Columns columns = Parser.extractColumns(class1);
 
         return parse(workbook, class1, columns);
     }
@@ -238,17 +237,6 @@ public class PoiTableParser {
         }
 
         return names;
-    }
-
-    private static <T> Columns extractColumns(Class<T> class1) {
-        Columns columns = new Columns();
-
-        List<Field> allFields = ReflectionUtils.getAllFields(class1);
-        for (Field field : allFields) {
-            columns.add(field);
-        }
-
-        return columns;
     }
 
 }
