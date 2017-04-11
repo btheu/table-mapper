@@ -14,10 +14,16 @@ import com.github.btheu.table.mapper.internal.Parser;
 
 public abstract class CSVWriter {
 
+    private static final char CSV_SEPARATORS = ';';
+
     public static <T> void write(List<T> table, OutputStream os) {
+        write(table, os, "ISO-8859-1");
+    }
+
+    public static <T> void write(List<T> table, OutputStream os, String charsetName) {
 
         try {
-            Writer writer = new OutputStreamWriter(os, "ISO-8859-1");
+            Writer writer = new OutputStreamWriter(os, charsetName);
 
             if (!table.isEmpty()) {
 
@@ -43,7 +49,7 @@ public abstract class CSVWriter {
             values.add(entry.getName());
         }
 
-        CSVUtils.writeLine(writer, values, ';', '"');
+        CSVUtils.writeLine(writer, values, CSV_SEPARATORS, '"');
     }
 
     private static <T> void writeItem(Columns columns, T item, Writer writer) {
@@ -67,7 +73,7 @@ public abstract class CSVWriter {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        CSVUtils.writeLine(writer, values, ';', '"');
+        CSVUtils.writeLine(writer, values, CSV_SEPARATORS, '"');
     }
 
 }

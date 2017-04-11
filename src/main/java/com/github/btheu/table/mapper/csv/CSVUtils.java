@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CSVUtils {
 
-    private static final char DEFAULT_SEPARATOR = ';';
+    protected static final char DEFAULT_SEPARATOR = ';';
 
     public static void writeLine(Writer w, List<String> values) {
         writeLine(w, values, DEFAULT_SEPARATOR, ' ');
