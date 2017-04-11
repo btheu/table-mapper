@@ -25,7 +25,7 @@ JAVA Table Mapper Annotation Driven
 <dependency>
    <groupId>com.github.btheu.table-mapper</groupId>
    <artifactId>table-mapper</artifactId>
-   <version>0.2.1</version>
+   <version>0.3.0</version>
 </dependency>
 ```
 
