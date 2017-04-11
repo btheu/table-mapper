@@ -11,6 +11,15 @@ JAVA Table Mapper Annotation Driven
 - Column name with regular expression
 - Date formatter for parsing date string value
 
+### Supports
+
+
+| Type | Read | Write | Update |
+|---|--------|--------|---|
+| CSV | No | Yes | No |
+| Excel | Yes | No | No |
+
+
 ### Download
 ```xml
 <dependency>
@@ -41,21 +50,21 @@ JAVA Table Mapper Annotation Driven
 ```java
     // No @Sheet => Handle the first sheet only by default
     public class PojoTable {
-
-	    @Column(value = "Numéro de rue", type = CellType.INT)
-	    private int numero;
-	    
-	    @Column("La rue")
-	    private String rue;
-	    
-	    @Column("La ville")
-	    private String ville;
-	    
-	    @Column(value = "Date création", type = CellType.DATE)
-	    private Date création;
-	    
-	    @Column(value = "Cout", type = CellType.BIG_DECIMAL)
-	    private BigDecimal cout;
+    
+       @Column(value = "Numéro de rue", type = CellType.INT)
+       private int numero;
+       
+       @Column("La rue")
+       private String rue;
+       
+       @Column("La ville")
+       private String ville;
+       
+       @Column(value = "Date création", type = CellType.DATE)
+       private Date création;
+       
+       @Column(value = "Cout", type = CellType.BIG_DECIMAL)
+       private BigDecimal cout;
     
     }
 ```
