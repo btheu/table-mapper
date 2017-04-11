@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.github.btheu.table.mapper.internal.Columns;
 import com.github.btheu.table.mapper.internal.Columns.Entry;
-import com.github.btheu.table.mapper.internal.Parser;
+import com.github.btheu.table.mapper.internal.TableParser;
 
 public abstract class CSVWriter {
 
@@ -27,7 +27,7 @@ public abstract class CSVWriter {
 
             if (!table.isEmpty()) {
 
-                Columns columns = Parser.extractColumns(table.get(0).getClass());
+                Columns columns = TableParser.parseClass(table.get(0).getClass());
 
                 writeHeader(columns, writer);
 
