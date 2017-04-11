@@ -17,7 +17,7 @@ JAVA Table Mapper Annotation Driven
 | Type | Read | Write | Update |
 |---|--------|--------|---|
 | CSV | No | Yes | No |
-| Excel | Yes | No | No |
+| Excel | Yes | No | Yes |
 
 
 ### Download
