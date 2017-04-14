@@ -183,6 +183,10 @@ public class PoiUtils {
     }
 
     public static void setValue(Cell cell, CellType cellType, Object value) {
+        if (value == null) {
+            cell.setCellValue((String) null);
+            return;
+        }
 
         switch (cellType) {
         case BIG_DECIMAL:

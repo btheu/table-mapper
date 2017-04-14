@@ -31,11 +31,11 @@ public class Excel97TableWriterTest {
 
         InputStream inputStream = Excel97TableWriterTest.class.getResourceAsStream(classeur);
 
-        List<MonTableauSheet1> parseExcel = TableMapper.parseExcel(inputStream, MonTableauSheet1.class);
+        List<MonTableauSheet1> items = TableMapper.parseExcel(inputStream, MonTableauSheet1.class);
 
         inputStream = Excel97TableWriterTest.class.getResourceAsStream(classeur);
 
-        for (MonTableauSheet1 monTableauSheet1 : parseExcel) {
+        for (MonTableauSheet1 monTableauSheet1 : items) {
             log.info("{}", monTableauSheet1.getNumero());
             log.info("{}", monTableauSheet1.getCout());
             if (monTableauSheet1.getNumero() == 3) {
@@ -46,7 +46,14 @@ public class Excel97TableWriterTest {
             }
         }
 
-        TableMapper.writeExcel(inputStream, parseExcel, new FileOutputStream(new File("out.xls")));
+        MonTableauSheet1 mts = new MonTableauSheet1();
+        mts.setNumero(123);
+        mts.setRue("Nouvelle Rue");
+        mts.setVille("Ville Nouvelle");
+
+        items.add(mts);
+
+        TableMapper.writeExcel(inputStream, items, new FileOutputStream(new File("out.xls")));
 
     }
 

@@ -1,6 +1,7 @@
 package com.github.btheu.table.mapper.poi;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,19 +84,55 @@ public class PoiTableWriter {
             }
         }
 
+        List<T> rows4inserts = new ArrayList<T>();
+
         // 2. Update rows
         for (T valueRow : valueRows) {
             Row tuple = index.find(valueRow, headerRow);
             if (tuple == null) {
-                log.warn("row not found for update, insertable not implemented. {}", valueRow);
+                log.debug("> insert row {}", valueRow);
+
+                rows4inserts.add(valueRow);
+
+                log.debug("< insert row");
             } else {
-                log.debug("> update row");
+                log.debug("> update row {}", valueRow);
 
                 writeUpdate(tuple, headerRow, valueRow, columns);
 
                 log.debug("< update row");
             }
         }
+
+        writeInsert(rows4inserts, headerRow, columns);
+    }
+
+    private static <T> void writeInsert(List<T> rows4inserts, Header headerRow, Columns columns) {
+        Row tuple = findFirstEmptyRow(headerRow);
+
+        for (T valueRow : rows4inserts) {
+
+            writeUpdate(tuple, headerRow, valueRow, columns);
+
+            tuple = tuple.getSheet().getRow(tuple.getRowNum() + 1);
+        }
+
+    }
+
+    private static Row findFirstEmptyRow(Header headerRow) {
+
+        Row row = PoiNavigationUtils.nextRowDown(headerRow.getHeaderRow());
+        int index = row.getRowNum();
+
+        while (!PoiTableParser.isEmptyRow2(headerRow, row)) {
+            index = row.getRowNum() + 1;
+            row = PoiNavigationUtils.nextRowDown(row);
+        }
+
+        if (row == null) {
+            row = headerRow.getHeaderRow().getSheet().createRow(index);
+        }
+        return row;
     }
 
     private static <T> void writeUpdate(Row tuple, Header headerRow, T valueRow, Columns columns) {
@@ -103,6 +140,9 @@ public class PoiTableWriter {
         for (HeaderCell headerCell : headerRow) {
 
             Cell cell = tuple.getCell(headerCell.getHeaderCell().getColumnIndex());
+            if (cell == null) {
+                cell = tuple.createCell(headerCell.getHeaderCell().getColumnIndex());
+            }
 
             Field field = headerCell.getEntry().getField();
 
