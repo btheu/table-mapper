@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -25,19 +26,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiTableWriter {
 
-    public static <T> void write(Workbook wb, List<T> rows) {
+    public static <T> void write(Workbook wb, List<T> valueRows) {
 
-        if (rows.isEmpty()) {
+        if (valueRows.isEmpty()) {
             log.debug("empty rows, nothing to do");
         } else {
-            Columns columns = TableParser.parseClass(rows.get(0).getClass());
+            Columns columns = TableParser.parseClass(valueRows.get(0).getClass());
 
-            write(wb, rows, columns);
+            write(wb, valueRows, columns);
         }
 
     }
 
-    private static <T> void write(Workbook workbook, List<T> rows, Columns columns) {
+    private static <T> void write(Workbook workbook, List<T> valueRows, Columns columns) {
 
         List<String> sheetNames = PoiTableParser.extractSheetsNames(workbook, columns.getDataClass());
 
@@ -49,12 +50,12 @@ public class PoiTableWriter {
 
             log.debug("Analysing: {}", sheetName);
 
-            write(sheet, rows, columns);
+            write(sheet, valueRows, columns);
         }
 
     }
 
-    private static <T> void write(Sheet sheet, List<T> rows, Columns columns) {
+    private static <T> void write(Sheet sheet, List<T> valueRows, Columns columns) {
 
         Header headerRow = PoiTableParser.findHeaderRow2(sheet, columns);
         if (headerRow == null) {
@@ -83,15 +84,34 @@ public class PoiTableWriter {
         }
 
         // 2. Update rows
-        for (T row : rows) {
-            Row tuple = index.find(row, headerRow);
+        for (T valueRow : valueRows) {
+            Row tuple = index.find(valueRow, headerRow);
             if (tuple == null) {
-                log.warn("row not found for update, insertable not implemented. {}", row);
+                log.warn("row not found for update, insertable not implemented. {}", valueRow);
             } else {
-                // TODO BTHEU update tuple
-                log.warn("update not implemented yet");
+                log.debug("> update row");
+
+                writeUpdate(tuple, headerRow, valueRow, columns);
+
+                log.debug("< update row");
             }
         }
+    }
+
+    private static <T> void writeUpdate(Row tuple, Header headerRow, T valueRow, Columns columns) {
+
+        for (HeaderCell headerCell : headerRow) {
+
+            Cell cell = tuple.getCell(headerCell.getHeaderCell().getColumnIndex());
+
+            Field field = headerCell.getEntry().getField();
+
+            Object value = ReflectionUtils.getValue(valueRow, field);
+
+            PoiUtils.setValue(cell, headerCell.getEntry().getType(), value);
+
+        }
+
     }
 
     /**

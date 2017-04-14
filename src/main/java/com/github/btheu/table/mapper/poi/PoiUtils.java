@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import org.apache.poi.ss.usermodel.Cell;
 
+import com.github.btheu.table.mapper.CellType;
 import com.github.btheu.table.mapper.utils.DateUtils;
 import com.github.btheu.table.mapper.utils.NumberUtils;
 
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PoiUtils {
 
     public static final DecimalFormat DF = new DecimalFormat("#");
-    public static final NumberFormat NF = NumberFormat.getInstance(Locale.FRENCH);
+    public static final NumberFormat  NF = NumberFormat.getInstance(Locale.FRENCH);
 
     public static Date getDateValue(Cell cell, String defaultValue, String format) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
@@ -179,6 +180,33 @@ public class PoiUtils {
         }
 
         return null;
+    }
+
+    public static void setValue(Cell cell, CellType cellType, Object value) {
+
+        switch (cellType) {
+        case BIG_DECIMAL:
+            cell.setCellValue(value.toString());
+            break;
+        case DATE:
+            cell.setCellValue((Date) value);
+            break;
+        case DOUBLE:
+            cell.setCellValue((Double) value);
+            break;
+        case INT:
+            cell.setCellValue((Integer) value);
+            break;
+        case LONG:
+            cell.setCellValue((Long) value);
+            break;
+        case STRING:
+            cell.setCellValue((String) value);
+            break;
+        default:
+            log.error("Type unknown : '{}'", cellType);
+        }
+
     }
 
 }

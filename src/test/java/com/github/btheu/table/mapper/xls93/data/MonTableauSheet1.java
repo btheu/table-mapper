@@ -24,7 +24,7 @@ public class MonTableauSheet1 {
     private String ville;
 
     @Column(value = "Date création", type = CellType.DATE)
-    private Date création;
+    private Date creation;
 
     @Column(value = "Coût", type = CellType.BIG_DECIMAL)
     private BigDecimal cout;

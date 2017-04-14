@@ -2,6 +2,7 @@ package com.github.btheu.table.mapper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -50,13 +51,15 @@ public class TableMapper {
         return null;
     }
 
-    public static <T> void writeExcel(InputStream inputStream, List<T> rows) {
+    public static <T> void writeExcel(InputStream inputStream, List<T> rows, OutputStream outputStream) {
         try {
             Workbook wb = WorkbookFactory.create(inputStream);
 
             PoiTableWriter.write(wb, rows);
 
             wb.close();
+
+            wb.write(outputStream);
         } catch (InvalidFormatException e) {
             log.error(e.getMessage(), e);
         } catch (IOException e) {
