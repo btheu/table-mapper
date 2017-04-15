@@ -1,8 +1,8 @@
 package com.github.btheu.table.mapper.xls93;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Excel97TableWriterTest {
 
     @Test
-    public void testSheet1() throws FileNotFoundException {
+    public void testSheet1() throws IOException {
 
         String classeur = "/Classeur97-2003.xls";
         log.info("Fichier : {} ", classeur);
@@ -70,7 +70,7 @@ public class Excel97TableWriterTest {
         mts.setVille("Ville Nouvelle");
         items.add(mts);
 
-        TableMapper.writeExcel(inputStream, items, new FileOutputStream(new File("out.xls")));
+        TableMapper.writeExcel(inputStream, items, new FileOutputStream(File.createTempFile("table-ammper", ".xls")));
 
     }
 
