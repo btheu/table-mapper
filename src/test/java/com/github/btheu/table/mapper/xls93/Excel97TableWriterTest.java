@@ -47,10 +47,27 @@ public class Excel97TableWriterTest {
         }
 
         MonTableauSheet1 mts = new MonTableauSheet1();
-        mts.setNumero(123);
+        mts.setNumero(1001);
         mts.setRue("Nouvelle Rue");
         mts.setVille("Ville Nouvelle");
+        items.add(mts);
 
+        mts = new MonTableauSheet1();
+        mts.setNumero(1002);
+        mts.setRue("Nouvelle Rue");
+        mts.setVille("Ville Nouvelle");
+        items.add(mts);
+
+        mts = new MonTableauSheet1();
+        mts.setNumero(1003);
+        mts.setRue("Nouvelle Rue");
+        mts.setVille("Ville Nouvelle");
+        items.add(mts);
+
+        mts = new MonTableauSheet1();
+        mts.setNumero(1004);
+        mts.setRue("Nouvelle Rue");
+        mts.setVille("Ville Nouvelle");
         items.add(mts);
 
         TableMapper.writeExcel(inputStream, items, new FileOutputStream(new File("out.xls")));

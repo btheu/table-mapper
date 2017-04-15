@@ -90,11 +90,9 @@ public class PoiTableWriter {
         for (T valueRow : valueRows) {
             Row tuple = index.find(valueRow, headerRow);
             if (tuple == null) {
-                log.debug("> insert row {}", valueRow);
 
                 rows4inserts.add(valueRow);
 
-                log.debug("< insert row");
             } else {
                 log.debug("> update row {}", valueRow);
 
@@ -108,40 +106,47 @@ public class PoiTableWriter {
     }
 
     private static <T> void writeInsert(List<T> rows4inserts, Header headerRow, Columns columns) {
-        Row tuple = findFirstEmptyRow(headerRow);
+        Row tuple = findFirstEmptyRow(headerRow, headerRow.getHeaderRow());
 
         for (T valueRow : rows4inserts) {
+            log.debug("> insert row {}", valueRow);
 
             writeUpdate(tuple, headerRow, valueRow, columns);
 
-            tuple = tuple.getSheet().getRow(tuple.getRowNum() + 1);
+            log.debug("< insert row {}", valueRow);
+
+            tuple = findFirstEmptyRow(headerRow, tuple);
         }
 
     }
 
-    private static Row findFirstEmptyRow(Header headerRow) {
+    private static Row findFirstEmptyRow(Header headerRow, Row row) {
 
-        Row row = PoiNavigationUtils.nextRowDown(headerRow.getHeaderRow());
-        int index = row.getRowNum();
+        Row nextRow = PoiNavigationUtils.nextRowDown(row);
+        int index = row.getRowNum() + 1;
 
-        while (!PoiTableParser.isEmptyRow2(headerRow, row)) {
-            index = row.getRowNum() + 1;
-            row = PoiNavigationUtils.nextRowDown(row);
+        while (!PoiTableParser.isEmptyRow2(headerRow, nextRow)) {
+            index = nextRow.getRowNum() + 1;
+            nextRow = PoiNavigationUtils.nextRowDown(nextRow);
         }
 
-        if (row == null) {
-            row = headerRow.getHeaderRow().getSheet().createRow(index);
+        if (nextRow == null) {
+            nextRow = headerRow.getHeaderRow().getSheet().createRow(index);
+            log.debug("create row {}", nextRow.getRowNum() + 1);
         }
-        return row;
+        return nextRow;
     }
 
     private static <T> void writeUpdate(Row tuple, Header headerRow, T valueRow, Columns columns) {
+
+        log.debug("write L{} {}", tuple.getRowNum() + 1, valueRow);
 
         for (HeaderCell headerCell : headerRow) {
 
             Cell cell = tuple.getCell(headerCell.getHeaderCell().getColumnIndex());
             if (cell == null) {
                 cell = tuple.createCell(headerCell.getHeaderCell().getColumnIndex());
+                log.debug("create cell {}", PoiUtils.toString(cell));
             }
 
             Field field = headerCell.getEntry().getField();
