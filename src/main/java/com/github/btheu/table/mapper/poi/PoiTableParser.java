@@ -27,16 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiTableParser {
 
-    /**
-     * Size max of table header. Aka, column number max.
-     */
-    public static int HEADER_SIZE_MAX = 100;
-
-    /**
-     * The number of empty line telling that the table is ended.
-     */
-    public static int EMPTY_LINES_FOR_END = 10;
-
     public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
         Columns columns = TableParser.parseClass(class1);
@@ -80,7 +70,7 @@ public class PoiTableParser {
         int lineNumber = header.getHeaderRow().getRowNum();
 
         int nbEmptyRow = 0;
-        while (nbEmptyRow < EMPTY_LINES_FOR_END) {
+        while (nbEmptyRow <= sheet.getLastRowNum()) {
             Row currentRow = sheet.getRow(++lineNumber);
 
             if (isEmptyRow2(header, currentRow)) {
@@ -137,10 +127,10 @@ public class PoiTableParser {
 
     public static Header findHeaderRow(Sheet sheet, Columns columns) {
 
-        for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
+        for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow(rowIndex);
             if (row != null) {
-                for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
+                for (int cellIndex = row.getFirstCellNum(); cellIndex <= row.getLastCellNum(); cellIndex++) {
                     Cell cell = row.getCell(cellIndex);
                     if (isCellFromHeader(cell, columns)) {
                         int lastIndex = isHeaderRow(cell, columns);
@@ -170,7 +160,7 @@ public class PoiTableParser {
 
         for (Entry column : columns.getColumns()) {
             boolean found = false;
-            for (int cellIndex = indexFirstCell; cellIndex < indexFirstCell + HEADER_SIZE_MAX; cellIndex++) {
+            for (int cellIndex = indexFirstCell; cellIndex < firstCell.getRow().getLastCellNum(); cellIndex++) {
 
                 Cell current = firstCell.getRow().getCell(cellIndex);
 

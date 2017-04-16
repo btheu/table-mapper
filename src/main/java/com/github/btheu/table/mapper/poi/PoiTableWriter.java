@@ -69,7 +69,7 @@ public class PoiTableWriter {
 
         // 1. Indexation of row with primary info
         int nbEmptyRow = 0;
-        while (nbEmptyRow < PoiTableParser.EMPTY_LINES_FOR_END) {
+        while (nbEmptyRow <= sheet.getLastRowNum()) {
             Row currentRow = sheet.getRow(++lineNumber);
 
             if (PoiTableParser.isEmptyRow2(headerRow, currentRow)) {
