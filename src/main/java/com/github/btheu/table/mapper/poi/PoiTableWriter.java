@@ -58,7 +58,7 @@ public class PoiTableWriter {
 
     private static <T> void write(Sheet sheet, List<T> valueRows, Columns columns) {
 
-        Header headerRow = PoiTableParser.findHeaderRow2(sheet, columns);
+        Header headerRow = PoiTableParser.findHeaderRow(sheet, columns);
         if (headerRow == null) {
             log.debug("[{}] have no table for [{}]", sheet.getSheetName(), columns.getDataClass().getSimpleName());
         }

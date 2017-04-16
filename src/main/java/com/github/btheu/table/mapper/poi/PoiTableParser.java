@@ -71,24 +71,24 @@ public class PoiTableParser {
 
         List<T> results = new ArrayList<T>();
 
-        HeaderRow headerRow = findHeaderRow(sheet, columns);
-        if (headerRow == null) {
+        Header header = findHeaderRow(sheet, columns);
+        if (header == null) {
             log.debug("[{}] have no table for [{}]", sheet.getSheetName(), columns.getDataClass().getSimpleName());
             return results;
         }
 
-        int lineNumber = headerRow.getRow().getRowNum();
+        int lineNumber = header.getHeaderRow().getRowNum();
 
         int nbEmptyRow = 0;
         while (nbEmptyRow < EMPTY_LINES_FOR_END) {
             Row currentRow = sheet.getRow(++lineNumber);
 
-            if (isEmptyRow(headerRow, currentRow)) {
+            if (isEmptyRow2(header, currentRow)) {
                 nbEmptyRow++;
             } else {
                 nbEmptyRow = 0;
 
-                T parse = parse(headerRow, currentRow, columns);
+                T parse = parse(header, currentRow, columns);
 
                 results.add(parse);
             }
@@ -119,29 +119,6 @@ public class PoiTableParser {
         }
     }
 
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> T parse(HeaderRow headerRow, Row currentRow, Columns columns) {
-
-        try {
-            T result = (T) columns.getDataClass().newInstance();
-
-            for (int columnIndex = headerRow.getCellIndexBegin(); columnIndex <= headerRow
-                    .getCellIndexEnd(); columnIndex++) {
-
-                PoiMapper.map(columns, result, headerRow.getRow().getCell(columnIndex),
-                        currentRow.getCell(columnIndex));
-            }
-
-            return result;
-
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static boolean isEmptyRow2(Header headerRow, Row currentRow) {
         if (currentRow == null) {
             return true;
@@ -158,25 +135,7 @@ public class PoiTableParser {
         return true;
     }
 
-    @Deprecated
-    public static boolean isEmptyRow(HeaderRow headerRow, Row currentRow) {
-        if (currentRow == null) {
-            return true;
-        }
-        for (int i = headerRow.getCellIndexBegin(); i <= headerRow.getCellIndexEnd(); i++) {
-
-            Cell cell = currentRow.getCell(i);
-
-            String value = PoiUtils.getValueString(cell);
-            if (StringUtils.isNotBlank(value)) {
-                return false;
-            }
-
-        }
-        return true;
-    }
-
-    public static Header findHeaderRow2(Sheet sheet, Columns columns) {
+    public static Header findHeaderRow(Sheet sheet, Columns columns) {
 
         for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
@@ -196,44 +155,6 @@ public class PoiTableParser {
         }
         return null;
 
-    }
-
-    /**
-     * Recherche une ligne dans le tableur correspondant aux colonnes attendues
-     * par le POJO
-     * 
-     * @param sheet
-     *            La feuille a parcourir
-     * @param columns
-     *            Le nom des colonnes reherchées
-     * @return Un objet contenant les informations relatives à l'entete du
-     *         tableau recherché, null si le tableau n'a pas été trouvé
-     * @deprecated user findHeaderRow2
-     */
-    @Deprecated
-    public static HeaderRow findHeaderRow(Sheet sheet, Columns columns) {
-        for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
-            Row row = sheet.getRow(rowIndex);
-            if (row != null) {
-                for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
-                    Cell cell = row.getCell(cellIndex);
-                    if (isCellFromHeader(cell, columns)) {
-                        int lastIndex = isHeaderRow(cell, columns);
-                        if (lastIndex != -1) {
-                            log.debug("Header found");
-
-                            HeaderRow headerRow = new HeaderRow();
-                            headerRow.setRow(cell.getRow());
-                            headerRow.setCellIndexBegin(cell.getColumnIndex());
-                            headerRow.setCellIndexEnd(lastIndex);
-                            return headerRow;
-
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     /**
