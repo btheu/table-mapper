@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.github.btheu.table.mapper.internal.Columns;
+import com.github.btheu.table.mapper.internal.TableData;
 import com.github.btheu.table.mapper.internal.TableParser;
 import com.github.btheu.table.mapper.poi.Header.HeaderCell;
 import com.github.btheu.table.mapper.utils.ReflectionUtils;
@@ -32,14 +32,14 @@ public class PoiTableWriter {
         if (valueRows.isEmpty()) {
             log.debug("empty rows, nothing to do");
         } else {
-            Columns columns = TableParser.parseClass(valueRows.get(0).getClass());
+            TableData columns = TableParser.parseClass(valueRows.get(0).getClass());
 
             write(wb, valueRows, columns);
         }
 
     }
 
-    private static <T> void write(Workbook workbook, List<T> valueRows, Columns columns) {
+    private static <T> void write(Workbook workbook, List<T> valueRows, TableData columns) {
 
         List<String> sheetNames = PoiTableParser.extractSheetsNames(workbook, columns.getDataClass());
 
@@ -56,7 +56,7 @@ public class PoiTableWriter {
 
     }
 
-    private static <T> void write(Sheet sheet, List<T> valueRows, Columns columns) {
+    private static <T> void write(Sheet sheet, List<T> valueRows, TableData columns) {
 
         Header headerRow = PoiTableParser.findHeaderRow(sheet, columns);
         if (headerRow == null) {
@@ -105,7 +105,7 @@ public class PoiTableWriter {
         writeInsert(rows4inserts, headerRow, columns);
     }
 
-    private static <T> void writeInsert(List<T> rows4inserts, Header headerRow, Columns columns) {
+    private static <T> void writeInsert(List<T> rows4inserts, Header headerRow, TableData columns) {
         Row tuple = findFirstEmptyRow(headerRow, headerRow.getHeaderRow());
 
         for (T valueRow : rows4inserts) {
@@ -137,7 +137,7 @@ public class PoiTableWriter {
         return nextRow;
     }
 
-    private static <T> void writeUpdate(Row tuple, Header headerRow, T valueRow, Columns columns) {
+    private static <T> void writeUpdate(Row tuple, Header headerRow, T valueRow, TableData columns) {
 
         log.debug("write L{} {}", tuple.getRowNum() + 1, valueRow);
 
@@ -149,11 +149,11 @@ public class PoiTableWriter {
                 log.debug("create cell {}", PoiUtils.toString(cell));
             }
 
-            Field field = headerCell.getEntry().getField();
+            Field field = headerCell.getColumn().getField();
 
             Object value = ReflectionUtils.getValue(valueRow, field);
 
-            PoiUtils.setValue(cell, headerCell.getEntry().getType(), value);
+            PoiUtils.setValue(cell, headerCell.getColumn().getType(), value);
 
         }
 
@@ -185,6 +185,8 @@ public class PoiTableWriter {
         }
 
         /**
+         * FIXME btheu makes better createHashKey (lombok like)
+         * 
          * Build a hashKey from current row and primary key
          * 
          * @param row
@@ -194,9 +196,9 @@ public class PoiTableWriter {
         private String createHashKey(T row, Header headerRow) {
             StringBuilder sb = new StringBuilder();
             for (HeaderCell headerCell : headerRow) {
-                if (headerCell.getEntry().isPrimaryKey()) {
+                if (headerCell.getColumn().isPrimaryKey()) {
 
-                    Field field = headerCell.getEntry().getField();
+                    Field field = headerCell.getColumn().getField();
 
                     Object value = ReflectionUtils.getValue(row, field);
 

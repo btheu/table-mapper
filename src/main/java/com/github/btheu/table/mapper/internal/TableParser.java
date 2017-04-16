@@ -7,8 +7,8 @@ import com.github.btheu.table.mapper.utils.ReflectionUtils;
 
 public class TableParser {
 
-    public static <T> Columns parseClass(Class<T> class1) {
-        Columns columns = new Columns(class1);
+    public static <T> TableData parseClass(Class<T> class1) {
+        TableData columns = new TableData(class1);
 
         List<Field> allFields = ReflectionUtils.getAllFields(class1);
         for (Field field : allFields) {

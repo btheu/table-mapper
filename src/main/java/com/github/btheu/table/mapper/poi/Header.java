@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.github.btheu.table.mapper.internal.Columns;
-import com.github.btheu.table.mapper.internal.Columns.Entry;
+import com.github.btheu.table.mapper.internal.TableData;
+import com.github.btheu.table.mapper.internal.TableData.ColumnData;
 import com.github.btheu.table.mapper.poi.Header.HeaderCell;
 
 import lombok.Data;
@@ -28,19 +28,19 @@ public class Header extends ArrayList<HeaderCell> {
      */
     protected Row headerRow;
 
-    public Header(Cell firstLeftCell, Columns columns) {
+    public Header(Cell firstLeftCell, TableData columns) {
 
         headerRow = firstLeftCell.getRow();
 
-        for (Entry entry : columns.getColumns()) {
+        for (ColumnData column : columns.getColumns()) {
 
-            HeaderCell hc = findHeaderCell(entry, firstLeftCell);
+            HeaderCell hc = findHeaderCell(column, firstLeftCell);
 
             this.add(hc);
         }
     }
 
-    private HeaderCell findHeaderCell(Entry entry, Cell firstLeftCell) {
+    private HeaderCell findHeaderCell(ColumnData column, Cell firstLeftCell) {
         Row row = firstLeftCell.getRow();
         int columnIndex = firstLeftCell.getColumnIndex();
 
@@ -48,8 +48,8 @@ public class Header extends ArrayList<HeaderCell> {
 
             Cell headerCell = row.getCell(i);
 
-            if (entry.match(headerCell.getStringCellValue())) {
-                return new HeaderCell(headerCell, entry);
+            if (column.match(headerCell.getStringCellValue())) {
+                return new HeaderCell(headerCell, column);
             }
         }
 
@@ -62,16 +62,16 @@ public class Header extends ArrayList<HeaderCell> {
         /**
          * The data column
          */
-        protected Entry entry;
+        protected ColumnData column;
 
         /**
          * The POI header cell for the column
          */
         protected Cell headerCell;
 
-        public HeaderCell(Cell headerCell2, Entry entry2) {
-            headerCell = headerCell2;
-            entry = entry2;
+        public HeaderCell(Cell headerCell, ColumnData column) {
+            this.headerCell = headerCell;
+            this.column = column;
         }
     }
 

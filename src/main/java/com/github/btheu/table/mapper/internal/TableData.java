@@ -16,18 +16,16 @@ import lombok.Data;
  * @author btheu
  * 
  */
-// TODO BTHEU rename Columns to TableData
-// TODO BTHEU rename Entry to ColumnData
 @Data
-public class Columns {
+public class TableData {
 
-    protected List<Entry> primaries = new ArrayList<Entry>();
+    protected List<ColumnData> primaries = new ArrayList<ColumnData>();
 
-    protected List<Entry> columns = new ArrayList<Entry>();
+    protected List<ColumnData> columns = new ArrayList<ColumnData>();
 
     protected Class<?> dataClass;
 
-    public Columns(Class<?> clazz) {
+    public TableData(Class<?> clazz) {
         this.dataClass = clazz;
     }
 
@@ -37,14 +35,14 @@ public class Columns {
 
         Column aColumn = field.getAnnotation(Column.class);
         if (aColumn != null) {
-            Entry entry = new Entry(field, aColumn);
+            ColumnData column = new ColumnData(field, aColumn);
 
             if (aId != null) {
-                entry.setPrimaryKey(true);
-                primaries.add(entry);
+                column.setPrimaryKey(true);
+                primaries.add(column);
             }
 
-            columns.add(entry);
+            columns.add(column);
         }
     }
 
@@ -55,7 +53,7 @@ public class Columns {
      *
      */
     @Data
-    public static class Entry {
+    public static class ColumnData {
 
         protected String name;
 
@@ -76,7 +74,7 @@ public class Columns {
 
         protected CellType type;
 
-        public Entry(Field field, Column column) {
+        public ColumnData(Field field, Column column) {
             this.field = field;
             name = column.value();
             type = column.type();
@@ -116,8 +114,8 @@ public class Columns {
      * @return true if columName match at least one column
      */
     public boolean match(String columnName) {
-        for (Entry entry : columns) {
-            if (entry.match(columnName)) {
+        for (ColumnData column : columns) {
+            if (column.match(columnName)) {
                 return true;
             }
         }

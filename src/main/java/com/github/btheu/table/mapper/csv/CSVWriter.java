@@ -8,8 +8,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.btheu.table.mapper.internal.Columns;
-import com.github.btheu.table.mapper.internal.Columns.Entry;
+import com.github.btheu.table.mapper.internal.TableData;
+import com.github.btheu.table.mapper.internal.TableData.ColumnData;
 import com.github.btheu.table.mapper.internal.TableParser;
 
 public abstract class CSVWriter {
@@ -27,7 +27,7 @@ public abstract class CSVWriter {
 
             if (!table.isEmpty()) {
 
-                Columns columns = TableParser.parseClass(table.get(0).getClass());
+                TableData columns = TableParser.parseClass(table.get(0).getClass());
 
                 writeHeader(columns, writer);
 
@@ -42,23 +42,23 @@ public abstract class CSVWriter {
         }
     }
 
-    private static void writeHeader(Columns columns, Writer writer) {
+    private static void writeHeader(TableData columns, Writer writer) {
         List<String> values = new ArrayList<String>();
 
-        for (Entry entry : columns.getColumns()) {
-            values.add(entry.getName());
+        for (ColumnData column : columns.getColumns()) {
+            values.add(column.getName());
         }
 
         CSVUtils.writeLine(writer, values, CSV_SEPARATORS, '"');
     }
 
-    private static <T> void writeItem(Columns columns, T item, Writer writer) {
+    private static <T> void writeItem(TableData columns, T item, Writer writer) {
         List<String> values = new ArrayList<String>();
 
         try {
-            for (Entry entry : columns.getColumns()) {
+            for (ColumnData column : columns.getColumns()) {
 
-                Field field = entry.getField();
+                Field field = column.getField();
 
                 Object value = field.get(item);
                 if (value == null) {

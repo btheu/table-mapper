@@ -11,8 +11,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import com.github.btheu.table.mapper.SheetAll;
-import com.github.btheu.table.mapper.internal.Columns;
-import com.github.btheu.table.mapper.internal.Columns.Entry;
+import com.github.btheu.table.mapper.internal.TableData;
+import com.github.btheu.table.mapper.internal.TableData.ColumnData;
 import com.github.btheu.table.mapper.internal.TableParser;
 import com.github.btheu.table.mapper.poi.Header.HeaderCell;
 
@@ -29,12 +29,12 @@ public class PoiTableParser {
 
     public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
-        Columns columns = TableParser.parseClass(class1);
+        TableData columns = TableParser.parseClass(class1);
 
         return parse(workbook, columns);
     }
 
-    private static <T> List<T> parse(Workbook workbook, Columns columns) {
+    private static <T> List<T> parse(Workbook workbook, TableData columns) {
 
         List<T> results = new ArrayList<T>();
 
@@ -57,7 +57,7 @@ public class PoiTableParser {
 
     }
 
-    private static <T> List<T> parse(Sheet sheet, Columns columns) {
+    private static <T> List<T> parse(Sheet sheet, TableData columns) {
 
         List<T> results = new ArrayList<T>();
 
@@ -88,14 +88,14 @@ public class PoiTableParser {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T parse(Header header, Row currentRow, Columns columns) {
+    public static <T> T parse(Header header, Row currentRow, TableData columns) {
 
         try {
             T result = (T) columns.getDataClass().newInstance();
 
             for (HeaderCell headerCell : header) {
 
-                PoiMapper.setValue(headerCell.getEntry(), result,
+                PoiMapper.setValue(headerCell.getColumn(), result,
                         currentRow.getCell(headerCell.getHeaderCell().getColumnIndex()));
 
             }
@@ -125,7 +125,7 @@ public class PoiTableParser {
         return true;
     }
 
-    public static Header findHeaderRow(Sheet sheet, Columns columns) {
+    public static Header findHeaderRow(Sheet sheet, TableData columns) {
 
         for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow(rowIndex);
@@ -153,12 +153,12 @@ public class PoiTableParser {
      * @param columns
      * @return The last column index cell of the table
      */
-    private static int isHeaderRow(Cell firstCell, Columns columns) {
+    private static int isHeaderRow(Cell firstCell, TableData columns) {
 
         int indexFirstCell = firstCell.getColumnIndex();
         int indexOfLastColumn = -1;
 
-        for (Entry column : columns.getColumns()) {
+        for (ColumnData column : columns.getColumns()) {
             boolean found = false;
             for (int cellIndex = indexFirstCell; cellIndex < firstCell.getRow().getLastCellNum(); cellIndex++) {
 
@@ -179,11 +179,11 @@ public class PoiTableParser {
         return indexOfLastColumn;
     }
 
-    private static boolean isCellFromHeader(Cell cell, Entry column) {
+    private static boolean isCellFromHeader(Cell cell, ColumnData column) {
         return cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && column.match(cell.getStringCellValue());
     }
 
-    private static boolean isCellFromHeader(Cell cell, Columns columns) {
+    private static boolean isCellFromHeader(Cell cell, TableData columns) {
         return cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && columns.match(cell.getStringCellValue());
     }
 
