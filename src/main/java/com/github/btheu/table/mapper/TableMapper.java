@@ -24,6 +24,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TableMapper {
 
+    public static Workbook openExcelDocument(InputStream inputStream) {
+        try {
+            Workbook document = WorkbookFactory.create(inputStream);
+
+            return document;
+        } catch (InvalidFormatException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return null;
+    }
+
+    public static <T> List<T> parseExcel(Workbook document, Class<T> targetClass) {
+        return PoiTableParser.parse(document, targetClass);
+    }
+
     /**
      * Parse un tableau Excel
      * 
@@ -34,21 +52,9 @@ public class TableMapper {
      * @return La liste des objets parsés dans le tableau Excel
      */
     public static <T> List<T> parseExcel(InputStream inputStream, Class<T> targetClass) {
-        try {
-            Workbook wb = WorkbookFactory.create(inputStream);
+        Workbook document = openExcelDocument(inputStream);
 
-            List<T> parse = PoiTableParser.parse(wb, targetClass);
-
-            wb.close();
-
-            return parse;
-        } catch (InvalidFormatException e) {
-            log.error(e.getMessage(), e);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        return null;
+        return parseExcel(document, targetClass);
     }
 
     public static <T> void writeExcel(InputStream inputStream, List<T> rows, OutputStream outputStream) {
