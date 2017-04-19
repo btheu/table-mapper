@@ -31,14 +31,21 @@ public class PoiTableParser {
 
         TableData columns = TableParser.parseClass(class1);
 
-        return parse(workbook, columns);
+        List<String> sheetNames = extractSheetsNames(workbook, columns.getDataClass());
+
+        return parse(workbook, columns, sheetNames);
     }
 
-    private static <T> List<T> parse(Workbook workbook, TableData columns) {
+    public static <T> List<T> parse(Workbook document, Class<T> targetClass, String[] sheetNames) {
+
+        TableData columns = TableParser.parseClass(targetClass);
+
+        return parse(document, columns, Arrays.asList(sheetNames));
+    }
+
+    private static <T> List<T> parse(Workbook workbook, TableData columns, List<String> sheetNames) {
 
         List<T> results = new ArrayList<T>();
-
-        List<String> sheetNames = extractSheetsNames(workbook, columns.getDataClass());
 
         for (String sheetName : sheetNames) {
             Sheet sheet = workbook.getSheet(sheetName);

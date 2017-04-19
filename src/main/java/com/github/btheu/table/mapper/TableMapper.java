@@ -43,6 +43,27 @@ public class TableMapper {
     }
 
     /**
+     * <p>
+     * Parse specified sheets for data
+     * <p>
+     * {@link Sheet} and {@link SheetAll} annotations will be ignored
+     * 
+     * @param inputStream
+     *            the document
+     * @param targetClass
+     *            the pojo target class
+     * @param sheets
+     *            names of sheets from which data will be parsed
+     * @return Parsed data filled in pojos
+     */
+    public static <T> List<T> parseExcel(InputStream inputStream, Class<T> targetClass, String... sheets) {
+
+        Workbook document = openExcelDocument(inputStream);
+
+        return PoiTableParser.parse(document, targetClass, sheets);
+    }
+
+    /**
      * Parse un tableau Excel
      * 
      * @param inputStream
