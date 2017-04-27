@@ -32,9 +32,9 @@ public class PoiTableWriter {
         if (valueRows.isEmpty()) {
             log.debug("empty rows, nothing to do");
         } else {
-            TableData columns = TableParser.parseClass(valueRows.get(0).getClass());
+            TableData tableData = TableParser.parseClass(valueRows.get(0).getClass());
 
-            write(wb, valueRows, columns);
+            write(wb, valueRows, tableData);
         }
 
     }
@@ -201,8 +201,11 @@ public class PoiTableWriter {
                     Field field = headerCell.getColumn().getField();
 
                     Object value = ReflectionUtils.getValue(row, field);
-
-                    sb.append(value.toString());
+                    if (value == null) {
+                        sb.append("null");
+                    } else {
+                        sb.append(value.toString());
+                    }
                     sb.append("$$");
                 }
             }
