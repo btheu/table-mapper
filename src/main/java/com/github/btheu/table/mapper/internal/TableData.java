@@ -66,6 +66,8 @@ public class TableData {
         protected boolean regex;
 
         protected boolean primaryKey;
+        
+        protected boolean optional;
 
         /**
          * The field, the column is mapped to
@@ -89,6 +91,8 @@ public class TableData {
             if (defaultValue.equals(Column.NOT_OPTIONAL)) {
                 defaultValue = null;
             }
+            
+            optional = column.optional();
         }
 
         /**

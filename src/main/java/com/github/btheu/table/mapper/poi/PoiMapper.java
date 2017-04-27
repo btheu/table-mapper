@@ -40,9 +40,21 @@ public class PoiMapper {
 
         Object value = safeEvaluate(column, valueCell);
 
-        Field field = column.getField();
+        if (value == null) {
+            if (!column.isOptional()) {
+                if (valueCell == null) {
+                    throw new RuntimeException("No Value for " + column.getName());
+                } else {
+                    String cell = (valueCell.getRowIndex() + 1) + "," + (valueCell.getColumnIndex() + 1);
 
-        ReflectionUtils.setValue(target, field, value);
+                    throw new RuntimeException("No Value for " + column.getName() + " at [" + cell + "]");
+                }
+            }
+        } else {
+            Field field = column.getField();
+
+            ReflectionUtils.setValue(target, field, value);
+        }
     }
 
     /**
