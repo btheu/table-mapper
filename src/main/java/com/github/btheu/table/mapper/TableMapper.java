@@ -80,15 +80,31 @@ public class TableMapper {
 
     public static <T> void writeExcel(InputStream inputStream, List<T> rows, OutputStream outputStream) {
         try {
-            Workbook wb = WorkbookFactory.create(inputStream);
+            Workbook document = WorkbookFactory.create(inputStream);
 
-            PoiTableWriter.write(wb, rows);
+            writeExcel(document, rows, outputStream);
 
-            wb.close();
-
-            wb.write(outputStream);
         } catch (InvalidFormatException e) {
             log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 
+     * @param document
+     *            the excel document
+     * @param rows
+     *            pojos filled to write into the docuement
+     * @param outputStream
+     */
+    public static <T> void writeExcel(Workbook document, List<T> rows, OutputStream outputStream) {
+        try {
+            PoiTableWriter.write(document, rows);
+
+            document.write(outputStream);
+
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
