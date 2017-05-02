@@ -1,6 +1,5 @@
 package com.github.btheu.table.mapper.poi;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,9 +10,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.github.btheu.table.mapper.internal.Columns;
-import com.github.btheu.table.mapper.internal.Columns.Entry;
-import com.github.btheu.table.mapper.utils.ReflectionUtils;
+import com.github.btheu.table.mapper.SheetAll;
+import com.github.btheu.table.mapper.internal.TableData;
+import com.github.btheu.table.mapper.internal.TableData.ColumnData;
+import com.github.btheu.table.mapper.internal.TableParser;
+import com.github.btheu.table.mapper.poi.Header.HeaderCell;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,28 +27,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiTableParser {
 
-    /**
-     * Size max of table header. Aka, column number max.
-     */
-    public static int HEADER_SIZE_MAX = 100;
-
-    /**
-     * The number of empty line telling that the table is ended.
-     */
-    public static int EMPTY_LINES_FOR_END = 10;
-
     public static <T> List<T> parse(Workbook workbook, Class<T> class1) {
 
-        Columns columns = extractColumns(class1);
+        TableData columns = TableParser.parseClass(class1);
 
-        return parse(workbook, class1, columns);
+        List<String> sheetNames = extractSheetsNames(workbook, columns.getDataClass());
+
+        return parse(workbook, columns, sheetNames);
     }
 
-    private static <T> List<T> parse(Workbook workbook, Class<T> class1, Columns columns) {
+    public static <T> List<T> parse(Workbook document, Class<T> targetClass, String[] sheetNames) {
+
+        TableData columns = TableParser.parseClass(targetClass);
+
+        return parse(document, columns, Arrays.asList(sheetNames));
+    }
+
+    private static <T> List<T> parse(Workbook workbook, TableData columns, List<String> sheetNames) {
 
         List<T> results = new ArrayList<T>();
-
-        List<String> sheetNames = extractSheetsNames(workbook, class1);
 
         for (String sheetName : sheetNames) {
             Sheet sheet = workbook.getSheet(sheetName);
@@ -55,9 +53,9 @@ public class PoiTableParser {
                 throw new RuntimeException("Sheet '" + sheetName + "' was not found in the WorkBook");
             }
 
-            log.debug("Reading: {}", sheetName);
+            log.debug("Analysing: {}", sheetName);
 
-            List<T> parse = parse(sheet, class1, columns);
+            List<T> parse = parse(sheet, columns);
 
             results.addAll(parse);
         }
@@ -66,28 +64,28 @@ public class PoiTableParser {
 
     }
 
-    private static <T> List<T> parse(Sheet sheet, Class<T> class1, Columns columns) {
+    private static <T> List<T> parse(Sheet sheet, TableData columns) {
 
         List<T> results = new ArrayList<T>();
 
-        HeaderRow headerRow = findHeaderRow(sheet, columns);
-        if (headerRow == null) {
-            log.debug("[{}] have no table for [{}]", sheet.getSheetName(), class1.getSimpleName());
+        Header header = findHeaderRow(sheet, columns);
+        if (header == null) {
+            log.debug("[{}] have no table for [{}]", sheet.getSheetName(), columns.getDataClass().getSimpleName());
             return results;
         }
 
-        int lineNumber = headerRow.getRow().getRowNum();
+        int lineNumber = header.getHeaderRow().getRowNum();
 
         int nbEmptyRow = 0;
-        while (nbEmptyRow < EMPTY_LINES_FOR_END) {
+        while (nbEmptyRow <= sheet.getLastRowNum()) {
             Row currentRow = sheet.getRow(++lineNumber);
 
-            if (isEmptyRow(headerRow, currentRow)) {
+            if (isEmptyRow2(header, currentRow)) {
                 nbEmptyRow++;
             } else {
                 nbEmptyRow = 0;
 
-                T parse = parse(headerRow, currentRow, class1, columns);
+                T parse = parse(header, currentRow, columns);
 
                 results.add(parse);
             }
@@ -96,16 +94,17 @@ public class PoiTableParser {
         return results;
     }
 
-    private static <T> T parse(HeaderRow headerRow, Row currentRow, Class<T> class1, Columns columns) {
+    @SuppressWarnings("unchecked")
+    public static <T> T parse(Header header, Row currentRow, TableData columns) {
 
         try {
-            T result = class1.newInstance();
+            T result = (T) columns.getDataClass().newInstance();
 
-            for (int columnIndex = headerRow.getCellIndexBegin(); columnIndex <= headerRow
-                    .getCellIndexEnd(); columnIndex++) {
+            for (HeaderCell headerCell : header) {
 
-                PoiMapper.map(columns, result, headerRow.getRow().getCell(columnIndex),
-                        currentRow.getCell(columnIndex));
+                PoiMapper.setValue(headerCell.getColumn(), result,
+                        currentRow.getCell(headerCell.getHeaderCell().getColumnIndex()));
+
             }
 
             return result;
@@ -117,57 +116,42 @@ public class PoiTableParser {
         }
     }
 
-    private static boolean isEmptyRow(HeaderRow headerRow, Row currentRow) {
+    public static boolean isEmptyRow2(Header headerRow, Row currentRow) {
         if (currentRow == null) {
             return true;
         }
-        for (int i = headerRow.getCellIndexBegin(); i <= headerRow.getCellIndexEnd(); i++) {
 
-            Cell cell = currentRow.getCell(i);
+        for (HeaderCell headerCell : headerRow) {
+            Cell currentCell = currentRow.getCell(headerCell.getHeaderCell().getColumnIndex());
 
-            String value = PoiUtils.getValueString(cell);
+            String value = PoiUtils.getValueString(currentCell);
             if (StringUtils.isNotBlank(value)) {
                 return false;
             }
-
         }
         return true;
     }
 
-    /**
-     * Recherche une ligne dans le tableur correspondant aux colonnes attendues
-     * par le POJO
-     * 
-     * @param sheet
-     *            La feuille a parcourir
-     * @param columns
-     *            Le nom des colonnes reherchées
-     * @return Un objet contenant les informations relatives à l'entete du
-     *         tableau recherché, null si le tableau n'a pas été trouvé
-     */
-    private static HeaderRow findHeaderRow(Sheet sheet, Columns columns) {
-        for (int rowIndex = 0; rowIndex < HEADER_SIZE_MAX; rowIndex++) {
+    public static Header findHeaderRow(Sheet sheet, TableData columns) {
+
+        for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow(rowIndex);
-            for (int cellIndex = 0; cellIndex < HEADER_SIZE_MAX; cellIndex++) {
-                if (row != null) {
+            if (row != null) {
+                for (int cellIndex = row.getFirstCellNum(); cellIndex <= row.getLastCellNum(); cellIndex++) {
                     Cell cell = row.getCell(cellIndex);
                     if (isCellFromHeader(cell, columns)) {
                         int lastIndex = isHeaderRow(cell, columns);
                         if (lastIndex != -1) {
                             log.debug("Header found");
 
-                            HeaderRow headerRow = new HeaderRow();
-                            headerRow.setRow(cell.getRow());
-                            headerRow.setCellIndexBegin(cell.getColumnIndex());
-                            headerRow.setCellIndexEnd(lastIndex);
-                            return headerRow;
-
+                            return new Header(cell, columns);
                         }
                     }
                 }
             }
         }
         return null;
+
     }
 
     /**
@@ -176,14 +160,14 @@ public class PoiTableParser {
      * @param columns
      * @return The last column index cell of the table
      */
-    private static int isHeaderRow(Cell firstCell, Columns columns) {
+    private static int isHeaderRow(Cell firstCell, TableData columns) {
 
         int indexFirstCell = firstCell.getColumnIndex();
         int indexOfLastColumn = -1;
 
-        for (Entry column : columns.getColumns()) {
+        for (ColumnData column : columns.getColumns()) {
             boolean found = false;
-            for (int cellIndex = indexFirstCell; cellIndex < indexFirstCell + HEADER_SIZE_MAX; cellIndex++) {
+            for (int cellIndex = indexFirstCell; cellIndex < firstCell.getRow().getLastCellNum(); cellIndex++) {
 
                 Cell current = firstCell.getRow().getCell(cellIndex);
 
@@ -202,20 +186,19 @@ public class PoiTableParser {
         return indexOfLastColumn;
     }
 
-    private static boolean isCellFromHeader(Cell cell, Entry column) {
+    private static boolean isCellFromHeader(Cell cell, ColumnData column) {
         return cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && column.match(cell.getStringCellValue());
     }
 
-    private static boolean isCellFromHeader(Cell cell, Columns columns) {
+    private static boolean isCellFromHeader(Cell cell, TableData columns) {
         return cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING && columns.match(cell.getStringCellValue());
     }
 
-    private static <T> List<String> extractSheetsNames(Workbook workbook, Class<T> class1) {
+    public static <T> List<String> extractSheetsNames(Workbook workbook, Class<T> class1) {
         List<String> names = new ArrayList<String>();
 
         // Annotation @SheetAll
-        com.github.btheu.table.mapper.SheetAll annotationSheetAll = class1
-                .getAnnotation(com.github.btheu.table.mapper.SheetAll.class);
+        SheetAll annotationSheetAll = class1.getAnnotation(SheetAll.class);
 
         if (annotationSheetAll != null) {
             // Toutes les feuilles
@@ -238,17 +221,6 @@ public class PoiTableParser {
         }
 
         return names;
-    }
-
-    private static <T> Columns extractColumns(Class<T> class1) {
-        Columns columns = new Columns();
-
-        List<Field> allFields = ReflectionUtils.getAllFields(class1);
-        for (Field field : allFields) {
-            columns.add(field);
-        }
-
-        return columns;
     }
 
 }

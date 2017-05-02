@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import org.apache.poi.ss.usermodel.Cell;
 
+import com.github.btheu.table.mapper.CellType;
 import com.github.btheu.table.mapper.utils.DateUtils;
 import com.github.btheu.table.mapper.utils.NumberUtils;
 
@@ -19,14 +20,22 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class PoiUtils {
+public abstract class PoiUtils {
 
     public static final DecimalFormat DF = new DecimalFormat("#");
     public static final NumberFormat NF = NumberFormat.getInstance(Locale.FRENCH);
 
+    private PoiUtils() {
+        // abstract
+    }
+
     public static Date getDateValue(Cell cell, String defaultValue, String format) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
-            return DateUtils.parse(defaultValue, format);
+            if (defaultValue == null) {
+                return null;
+            } else {
+                return DateUtils.parse(defaultValue, format);
+            }
         }
         if (isAnyType(cell, Cell.CELL_TYPE_STRING, Cell.CELL_TYPE_FORMULA)) {
             return DateUtils.parse(getValueString(cell).trim(), format, defaultValue);
@@ -60,7 +69,11 @@ public class PoiUtils {
 
     public static Integer getIntValue(Cell cell, String defaultValue) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
-            return Integer.parseInt(defaultValue);
+            if (defaultValue == null) {
+                return null;
+            } else {
+                return Integer.parseInt(defaultValue);
+            }
         }
 
         if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
@@ -82,7 +95,11 @@ public class PoiUtils {
 
     public static Long getLongValue(Cell cell, String defaultValue) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
-            return Long.parseLong(defaultValue);
+            if (defaultValue == null) {
+                return null;
+            } else {
+                return Long.parseLong(defaultValue);
+            }
         }
 
         if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
@@ -104,7 +121,11 @@ public class PoiUtils {
 
     public static Double getDoubleValue(Cell cell, String defaultValue) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
-            return Double.parseDouble(defaultValue);
+            if (defaultValue == null) {
+                return null;
+            } else {
+                return Double.parseDouble(defaultValue);
+            }
         }
 
         if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
@@ -126,11 +147,15 @@ public class PoiUtils {
 
     public static BigDecimal getBigDecimalValue(Cell cell, String defaultValue) {
         if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
-            return new BigDecimal(defaultValue);
+            if (defaultValue == null) {
+                return null;
+            } else {
+                return new BigDecimal(defaultValue);
+            }
         }
 
         if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-            return new BigDecimal(cell.getNumericCellValue());
+            return BigDecimal.valueOf(cell.getNumericCellValue());
         }
 
         if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
@@ -140,7 +165,7 @@ public class PoiUtils {
         }
 
         if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
-            return new BigDecimal(cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator()
+            return BigDecimal.valueOf(cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator()
                     .evaluate(cell).getNumberValue());
         }
         return null;
@@ -179,6 +204,37 @@ public class PoiUtils {
         }
 
         return null;
+    }
+
+    public static void setValue(Cell cell, CellType cellType, Object value) {
+        if (value == null) {
+            cell.setCellValue((String) null);
+            return;
+        }
+
+        switch (cellType) {
+        case BIG_DECIMAL:
+            cell.setCellValue(value.toString());
+            break;
+        case DATE:
+            cell.setCellValue((Date) value);
+            break;
+        case DOUBLE:
+            cell.setCellValue((Double) value);
+            break;
+        case INT:
+            cell.setCellValue((Integer) value);
+            break;
+        case LONG:
+            cell.setCellValue((Long) value);
+            break;
+        case STRING:
+            cell.setCellValue((String) value);
+            break;
+        default:
+            log.error("Type unknown : '{}'", cellType);
+        }
+
     }
 
 }

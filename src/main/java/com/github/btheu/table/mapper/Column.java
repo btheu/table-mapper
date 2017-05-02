@@ -18,7 +18,7 @@ public @interface Column {
 
     public static final String NOT_OPTIONAL = "__NOT_OPTIONAL__";
 
-	/**
+    /**
      * Le nom de la colonne dans le tableau fourni en entrée
      * 
      * @return Le Nom de la colonne correspondante.
@@ -37,7 +37,7 @@ public @interface Column {
 
     /**
      * <p>
-     * (optional) Define the data type for conversion 
+     * (optional) Define the data type for conversion
      * 
      * @return the value type expected
      */
@@ -61,4 +61,12 @@ public @interface Column {
      * @return true if value() must be read as a regex
      */
     boolean regex() default false;
+
+    /**
+     * <p>
+     * (optional) Indicate that the value is a optional
+     * 
+     * @return true if null value can be ignored when reading table
+     */
+    boolean optional() default true;
 }

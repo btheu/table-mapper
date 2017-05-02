@@ -9,7 +9,7 @@ import java.util.List;
  * @author btheu
  *
  */
-public class CSVTableParser {
+public abstract class CSVTableParser {
 
     public static <T> List<T> parse(InputStream inputStream, Class<T> targetClass) {
         throw new RuntimeException("CSVTableParser non implémenté");

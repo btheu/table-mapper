@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 
  * @author btheu
  *
  */
+@Slf4j
 public class ReflectionUtils {
 
     public static List<Field> getAllFields(Class<?> clazz) {
@@ -33,6 +36,20 @@ public class ReflectionUtils {
         field.setAccessible(true);
 
         field.set(target, value);
+    }
+
+    public static Object getValue(Object target, Field field) {
+
+        try {
+            field.setAccessible(true);
+
+            return field.get(target);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
 }

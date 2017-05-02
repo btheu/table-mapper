@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import org.apache.poi.ss.usermodel.Cell;
 
 import com.github.btheu.table.mapper.CellType;
-import com.github.btheu.table.mapper.internal.Columns;
-import com.github.btheu.table.mapper.internal.Columns.Entry;
+import com.github.btheu.table.mapper.internal.TableData;
+import com.github.btheu.table.mapper.internal.TableData.ColumnData;
 import com.github.btheu.table.mapper.utils.ReflectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PoiMapper {
 
-    public static <T> void map(final Columns columns, final T target, final Cell headerCell, final Cell valueCell) {
+    public static <T> void map(final TableData columns, final T target, final Cell headerCell, final Cell valueCell) {
 
         try {
-            for (Entry entry : columns.getColumns()) {
-                if (entry.match(headerCell.getStringCellValue())) {
-                    setValue(entry, target, valueCell);
+            for (ColumnData column : columns.getColumns()) {
+                if (column.match(headerCell.getStringCellValue())) {
+                    setValue(column, target, valueCell);
                     break;
                 }
             }
@@ -35,37 +35,49 @@ public class PoiMapper {
         }
     }
 
-    public static <T> void setValue(Entry entry, final T target, final Cell valueCell)
+    public static <T> void setValue(ColumnData column, final T target, final Cell valueCell)
             throws IllegalArgumentException, IllegalAccessException {
 
-        Object value = safeEvaluate(entry, valueCell);
+        Object value = safeEvaluate(column, valueCell);
 
-        Field field = entry.getField();
+        if (value == null) {
+            if (!column.isOptional()) {
+                if (valueCell == null) {
+                    throw new RuntimeException("No Value for " + column.getName());
+                } else {
+                    String cell = (valueCell.getRowIndex() + 1) + "," + (valueCell.getColumnIndex() + 1);
 
-        ReflectionUtils.setValue(target, field, value);
+                    throw new RuntimeException("No Value for " + column.getName() + " at [" + cell + "]");
+                }
+            }
+        } else {
+            Field field = column.getField();
+
+            ReflectionUtils.setValue(target, field, value);
+        }
     }
 
     /**
      * Handle type conversion and default value.
      * 
-     * @param entry
+     * @param column
      * @param valueCell
      * @return
      */
-    private static Object safeEvaluate(Entry entry, Cell valueCell) {
+    private static Object safeEvaluate(ColumnData column, Cell valueCell) {
 
         Object value;
 
-        String defaultValue = entry.getDefaultValue();
+        String defaultValue = column.getDefaultValue();
 
         if (log.isDebugEnabled()) {
-            log.debug("{}\t{} {}", PoiUtils.toString(valueCell), entry.getType().name(), entry.getName());
+            log.debug("{}\t{} {}", PoiUtils.toString(valueCell), column.getType().name(), column.getName());
         }
 
-        CellType targetType = entry.getType();
+        CellType targetType = column.getType();
         switch (targetType) {
         case DATE:
-            value = PoiUtils.getDateValue(valueCell, defaultValue, entry.getFormat());
+            value = PoiUtils.getDateValue(valueCell, defaultValue, column.getFormat());
             break;
         case INT:
             value = PoiUtils.getIntValue(valueCell, defaultValue);
