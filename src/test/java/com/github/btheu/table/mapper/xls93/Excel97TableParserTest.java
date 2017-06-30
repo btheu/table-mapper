@@ -54,6 +54,8 @@ public class Excel97TableParserTest {
 
         for (MonTableauSheetAll monTableauSheetAll : parseExcel) {
             log.info("{}", monTableauSheetAll);
+            
+            TestCase.assertEquals("Paris", monTableauSheetAll.getVille());
         }
 
     }

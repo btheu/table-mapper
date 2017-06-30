@@ -19,7 +19,7 @@ public class MonTableauSheetAll {
     @Column("La rue")
     private String rue;
 
-    @Column("La ville")
+    @Column(value = "La ville", defaultValue = "Paris")
     private String ville;
 
     @Column(value = "Date création", type = CellType.DATE, format = "yyyy/MM/dd")
