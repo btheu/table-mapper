@@ -25,7 +25,7 @@ JAVA Table Mapper Annotation Driven
 <dependency>
    <groupId>com.github.btheu.table-mapper</groupId>
    <artifactId>table-mapper</artifactId>
-   <version>0.3.0</version>
+   <version>0.3.1</version>
 </dependency>
 ```
 
@@ -57,7 +57,7 @@ JAVA Table Mapper Annotation Driven
        @Column("La rue")
        private String rue;
        
-       @Column("La ville")
+       @Column(value = "La ville", defaultValue = "Miami")
        private String ville;
        
        @Column(value = "Date création", type = CellType.DATE)
