@@ -92,7 +92,7 @@ public class PoiMapper {
             value = PoiUtils.getBigDecimalValue(valueCell, defaultValue);
             break;
         case STRING:
-            value = PoiUtils.getValueString(valueCell);
+            value = PoiUtils.getStringValue(valueCell, defaultValue);
             break;
         default:
             throw new RuntimeException("Not handled: " + targetType.name());

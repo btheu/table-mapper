@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 
 import com.github.btheu.table.mapper.CellType;
@@ -169,6 +170,14 @@ public abstract class PoiUtils {
                     .evaluate(cell).getNumberValue());
         }
         return null;
+    }
+
+    public static String getStringValue(Cell cell, String defaultValue) {
+        String valueString = getValueString(cell);
+        if (StringUtils.isBlank(valueString)) {
+            valueString = defaultValue;
+        }
+        return valueString;
     }
 
     public static boolean isAnyType(Cell cell, int... types) {
